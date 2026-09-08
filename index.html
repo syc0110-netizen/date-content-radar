@@ -272,9 +272,54 @@
 
   .couple-share { margin-top: 22px; }
 
+  /* compact slot history cards (on couple screen) */
+  .content-slot-compact {
+    display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; width: 100%;
+    font-family: inherit; transition: border-color 0.15s ease;
+  }
+  .content-slot-compact:hover { border-color: var(--accent); }
+  .content-slot-compact.accepted { border-color: var(--accent); background: var(--card-soft); }
+  .content-slot-compact .csc-emoji { font-size: 24px; flex: 0 0 auto; }
+  .content-slot-compact .csc-body { flex: 1; min-width: 0; }
+  .content-slot-compact .csc-title { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .content-slot-compact .csc-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .content-slot-compact .csc-arrow { font-size: 13px; color: var(--ink-soft); flex: 0 0 auto; }
+  .content-slot-compact .csc-badge { font-size: 11px; font-weight: 700; color: var(--accent); flex: 0 0 auto; }
+
+  /* content detail screen */
+  .content-wrap { flex: 1; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; width: 100%; animation: r-in 0.35s ease; }
+  .content-back { align-self: flex-start; margin-bottom: 14px; padding: 4px 0; }
+  .content-hero { text-align: center; margin-bottom: 6px; }
+  .content-hero-emoji { font-size: 52px; line-height: 1; display: block; margin-bottom: 8px; }
+  .content-hero-area { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--violet); margin: 0 0 4px; }
+  .content-hero-title { font-family: 'Do Hyeon', sans-serif; font-size: 26px; margin: 0 0 6px; text-wrap: balance; }
+  .content-hero-tagline { font-size: 14px; color: var(--ink-soft); margin: 0; }
+  .content-match {
+    text-align: center; font-size: 12.5px; color: var(--accent); font-weight: 700; background: var(--card-soft);
+    border: 1px dashed var(--line); border-radius: 999px; padding: 8px 16px; margin: 16px 0 0; align-self: center;
+  }
+  .content-meta-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+  .content-meta-row .meta-chip { font-size: 11.5px; }
+  .content-desc { font-size: 14.5px; color: var(--ink); line-height: 1.7; text-align: center; margin: 0 0 22px; }
+  .content-spots { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; }
+  .content-spots-title { font-size: 13px; font-weight: 700; margin: 0 0 10px; }
+  .content-spots-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .content-spots-list li { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .content-spots-list li b { color: var(--ink); }
+  .content-hashtags { margin-bottom: 18px; }
+  .content-source { text-align: center; font-size: 12.5px; margin-bottom: 22px; }
+  .content-source a { color: var(--violet); text-decoration: none; font-weight: 600; }
+  .content-source a:hover { text-decoration: underline; }
+  .content-actions { display: flex; gap: 10px; justify-content: center; }
+  .content-actions .btn-content-like, .content-actions .btn-content-dislike { padding: 13px 24px; font-size: 14px; }
+  .content-actions .btn-content-like.is-accepted { opacity: 0.7; cursor: default; }
+  #cd-final-note.content-final-note { text-align: center; margin-top: 14px; }
+
   @media (max-width: 380px) {
     .couple-portraits { gap: 8px; }
     .couple-person { max-width: 120px; }
+    .content-hero-title { font-size: 22px; }
   }
 </style>
 
@@ -412,6 +457,34 @@
     </div>
   </section>
 
+  <section class="screen" id="screen-content">
+    <div class="content-wrap">
+      <button class="back-btn content-back" id="btn-content-back">← 우리 커플 화면으로</button>
+      <div class="content-hero">
+        <span class="content-hero-emoji" id="cd-emoji"></span>
+        <p class="content-hero-area" id="cd-category"></p>
+        <h2 class="content-hero-title" id="cd-title"></h2>
+        <p class="content-hero-tagline" id="cd-tagline"></p>
+      </div>
+      <p class="content-match" id="cd-match"></p>
+      <div class="content-meta-row" id="cd-meta"></div>
+      <p class="content-desc" id="cd-desc"></p>
+      <div class="content-spots">
+        <p class="content-spots-title">📍 코스에 포함된 장소</p>
+        <ol class="content-spots-list" id="cd-spots"></ol>
+      </div>
+      <div class="chip-row content-hashtags" id="cd-hashtags"></div>
+      <p class="content-source">
+        <a id="cd-source" href="#" target="_blank" rel="noopener">stillpoint.kr에서 더 보기 →</a>
+      </p>
+      <div class="content-actions" id="cd-actions">
+        <button class="btn-content-like" id="btn-content-like">💕 이걸로 할래요</button>
+        <button class="btn-content-dislike" id="btn-content-dislike">🔄 다른 걸로</button>
+      </div>
+      <p class="content-final-note" id="cd-final-note" hidden>이 슬롯은 여기까지예요 — 커플 화면에서 새로 추천받아보세요.</p>
+    </div>
+  </section>
+
   <footer class="site">재미로 보는 유형 테스트예요 — 과학적 근거는 없어요 🙃</footer>
 </div>
 
@@ -483,7 +556,8 @@
     quiz: document.getElementById("screen-quiz"),
     result: document.getElementById("screen-result"),
     invited: document.getElementById("screen-invited"),
-    couple: document.getElementById("screen-couple")
+    couple: document.getElementById("screen-couple"),
+    content: document.getElementById("screen-content")
   };
   function showScreen(name) {
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
@@ -858,33 +932,68 @@
     return { pct: pct, combined: combined, good: good, complement: complement };
   }
 
-  // ---------- couple matching: date content pool ----------
+  // ---------- couple matching: date content pool (curated real courses, ref. stillpoint.kr) ----------
   var CONTENT_POOL = [
-    { id: "act1", category: "액티비티", emoji: "🔐", title: "방탈출 데이트", desc: "머리 맞대고 문제 풀다 보면 어색함은 순삭. 협동 미션형 데이트.", tags: { activity: 2, maker: 1, explorer: 1 } },
-    { id: "act2", category: "액티비티", emoji: "🎳", title: "볼링 & 스크린야구", desc: "승부욕 자극 데이트. 진 사람이 다음 데이트 코스 짜기 내기도 재밌음.", tags: { activity: 2, popup: 1 } },
-    { id: "act3", category: "액티비티", emoji: "🧗", title: "클라이밍 체험", desc: "땀 흘리고 나면 이상하게 더 친해지는 액티비티. 초보자 코스면 충분.", tags: { activity: 2, maker: 1 } },
-    { id: "food1", category: "미식", emoji: "🍣", title: "오마카세 코스", desc: "제대로 먹는 한 끼. 대화보다 접시에 집중하게 되는 순간들.", tags: { foodie: 2, alcohol: 1 } },
-    { id: "food2", category: "미식", emoji: "🍽️", title: "파인다이닝 디너", desc: "기념일 급 코스 요리. 드레스코드 맞추는 재미도 있음.", tags: { foodie: 2, culture: 1 } },
-    { id: "food3", category: "미식", emoji: "🍜", title: "노포 맛집 탐방", desc: "골목 안쪽 오래된 식당 찾아다니기. 로컬 맛집 헌팅형 데이트.", tags: { foodie: 2, explorer: 1 } },
-    { id: "alc1", category: "술집", emoji: "🍶", title: "이자카야 하이볼 투어", desc: "안주 하나에 하이볼 한 잔씩. 술이 술술 들어가는 조합.", tags: { alcohol: 2, foodie: 1 } },
-    { id: "alc2", category: "술집", emoji: "🍷", title: "루프탑 와인바", desc: "야경 보면서 와인 한 잔. 분위기로 이기고 들어가는 데이트.", tags: { alcohol: 2, culture: 1 } },
-    { id: "alc3", category: "술집", emoji: "🍺", title: "크래프트 맥주 펍 크롤", desc: "펍 두세 군데 옮겨 다니며 맥주 비교 시음. 은근 미식가 코스.", tags: { alcohol: 2, explorer: 1 } },
-    { id: "cafe1", category: "카페", emoji: "🍰", title: "디저트 카페 투어", desc: "케이크 반반 나눠 먹는 재미. 인생샷도 자연스럽게 남음.", tags: { cafe: 2, popup: 1 } },
-    { id: "cafe2", category: "카페", emoji: "🌇", title: "뷰맛집 루프탑 카페", desc: "커피 한 잔 시켜놓고 몇 시간이고 앉아있게 되는 곳.", tags: { cafe: 2, healer: 1 } },
-    { id: "pop1", category: "팝업/쇼핑", emoji: "🛍️", title: "팝업스토어 오픈런", desc: "요즘 제일 핫한 팝업 같이 줄서기. 트렌드 공유하는 재미.", tags: { popup: 2, explorer: 1 } },
-    { id: "pop2", category: "팝업/쇼핑", emoji: "👗", title: "편집숍 쇼핑 데이트", desc: "서로 코디 골라주기. 안 어울려도 일단 칭찬하고 보는 게 국룰.", tags: { popup: 2, culture: 1 } },
-    { id: "cul1", category: "전시/공연", emoji: "🖼️", title: "미술관 전시 관람", desc: "말 없이 걸어도 어색하지 않은 데이트. 감상 나누는 재미.", tags: { culture: 2, cafe: 1 } },
-    { id: "cul2", category: "전시/공연", emoji: "🎭", title: "소극장 공연", desc: "가까운 무대에서 보는 연극이나 뮤지컬. 여운이 오래 감.", tags: { culture: 2, alcohol: 1 } },
-    { id: "cul3", category: "전시/공연", emoji: "🎷", title: "재즈바 라이브 공연", desc: "칵테일 한 잔에 라이브 연주. 어른스러운 데이트 무드.", tags: { culture: 2, alcohol: 1 } },
-    { id: "mk1", category: "클래스", emoji: "🏺", title: "도자기 원데이클래스", desc: "손으로 직접 만든 컵을 서로 교환. 결과물이 오래 남는 데이트.", tags: { maker: 2, culture: 1 } },
-    { id: "mk2", category: "클래스", emoji: "💐", title: "플라워 클래스", desc: "꽃다발 하나씩 만들어서 교환. 향기까지 남는 데이트.", tags: { maker: 2, healer: 1 } },
-    { id: "mk3", category: "클래스", emoji: "👩‍🍳", title: "커플 쿠킹 클래스", desc: "같이 요리하고 같이 먹기. 합이 얼마나 맞는지 바로 알 수 있음.", tags: { maker: 2, foodie: 1 } },
-    { id: "exp1", category: "자연/피크닉", emoji: "🚗", title: "근교 당일치기 드라이브", desc: "정해진 목적지 없이 즉흥적으로 떠나는 반나절 여행.", tags: { explorer: 2, activity: 1 } },
-    { id: "exp2", category: "자연/피크닉", emoji: "🧺", title: "한강 피크닉 + 자전거", desc: "돗자리 깔고 간식 먹다가 자전거로 한 바퀴. 날씨 좋을 때 최고.", tags: { explorer: 2, healer: 1 } },
-    { id: "ott1", category: "홈데이트", emoji: "🛋️", title: "홈시네마 + 배달음식", desc: "영화 하나 골라놓고 배달 음식 시켜서 뒹굴뒹굴. 편안함 최고.", tags: { ott: 2, foodie: 1 } },
-    { id: "ott2", category: "홈데이트", emoji: "🎲", title: "보드게임 카페", desc: "승부욕 폭발하는 보드게임 한 판. 웃음 포인트 많은 데이트.", tags: { ott: 2, popup: 1 } },
-    { id: "heal1", category: "힐링/스파", emoji: "💆", title: "커플 스파 & 마사지", desc: "말 없이 그냥 쉬는 시간. 데이트도 결국 잘 쉬는 게 목표.", tags: { healer: 2, cafe: 1 } },
-    { id: "heal2", category: "힐링/스파", emoji: "📚", title: "조용한 북카페 반나절", desc: "각자 책 읽다가 가끔 눈 마주치는, 소소하고 편안한 데이트.", tags: { healer: 2, ott: 1 } }
+    { id: "yeouido", category: "여의도", emoji: "🌇", title: "여의도 한강 데이트코스", tagline: "더현대와 한강을 한번에 즐기는 여의도 피크닉",
+      desc: "쇼핑, 전시, 피크닉을 전부 도보로 잇는 코스. 더현대에서 눈이 즐겁고, 한강에서 마음이 놓여요.",
+      spots: ["ALT.1 더현대서울 — 백화점 안 갤러리 기획전", "한정선 — 피크닉용 생과일 찹쌀떡", "여의도한강공원 — 돗자리 펴고 노을까지"],
+      hashtags: ["#한강", "#피크닉", "#전시공연", "#쇼핑"], meta: { time: "낮", duration: "4~5시간", cost: "5~8만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%97%AC%EC%9D%98%EB%8F%84-%ED%95%9C%EA%B0%95-%EB%8D%B0%EC%9D%B4%ED%8A%B8%EC%BD%94%EC%8A%A4.html",
+      tags: { popup: 1, culture: 2, cafe: 1, healer: 2 } },
+    { id: "euljiro", category: "을지로", emoji: "🏮", title: "을지로 야장 데이트", tagline: "낮과 밤의 반전 매력이 있는 고밀도 을지로 코스",
+      desc: "낮엔 낡은 계단 위 감성 카페를, 밤엔 골목마다 펼쳐지는 야장을 즐기는 반전 매력 코스예요.",
+      spots: ["커피사 — 골목 안쪽 3층 카페", "Dive Records — 레코드숍 겸 바", "을지로 골목 야장 — 저녁이면 펼쳐지는 포차 거리"],
+      hashtags: ["#야장", "#골목", "#감성카페", "#힙지로"], meta: { time: "낮~밤", duration: "하루", cost: "15~20만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%9D%84%EC%A7%80%EB%A1%9C-%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { alcohol: 2, explorer: 1, cafe: 1 } },
+    { id: "cheongdam", category: "청담", emoji: "🍶", title: "청담 미식 데이트", tagline: "전시와 쿠킹 클래스, 프리미엄 일식까지",
+      desc: "직접 요리하고, 전시를 보고, 마지막은 근사한 일식 코스로. 완성도 높은 하루가 완성돼요.",
+      spots: ["현대카드 쿠킹 라이브러리 — 셰프와 함께하는 쿠킹 클래스", "K현대미술관 — 부담 없는 기획전", "청담 마코토 — 정갈한 코스 일식"],
+      hashtags: ["#쿠킹클래스", "#전시공연", "#일식", "#프리미엄"], meta: { time: "낮", duration: "반나절", cost: "15~20만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%B2%AD%EB%8B%B4-%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { foodie: 2, culture: 2, maker: 1 } },
+    { id: "419cafe", category: "4·19카페거리", emoji: "🍃", title: "4·19 카페거리 데이트", tagline: "서울이라 믿기 어려운 자연 속 힐링 코스",
+      desc: "북한산 자락을 따라 천천히 걷고, 산 아래 노포에서 막걸리 한잔으로 마무리하는 힐링 코스예요.",
+      spots: ["산마루쉼터 — 초록 풍경 보이는 창가 카페", "북한산 둘레길 2구간 — 부담 없이 걷는 산책로", "청화가든 — 손두부·막걸리로 마무리"],
+      hashtags: ["#힐링", "#둘레길", "#카페", "#막걸리"], meta: { time: "낮", duration: "4~5시간", cost: "3~5만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/419%EC%B9%B4%ED%8E%98%EA%B1%B0%EB%A6%AC-%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { healer: 2, cafe: 1, activity: 1 } },
+    { id: "seongsu-pop", category: "성수팝업", emoji: "🎷", title: "성수 팝업데이트", tagline: "성수의 트렌드를 가장 재밌게 즐기는 코스",
+      desc: "그때그때 달라지는 체험형 팝업과 라이브 재즈까지, 성수의 '지금'을 가장 빠르게 즐기는 코스예요.",
+      spots: ["T팩토리 성수 — 시즌마다 바뀌는 체험형 팝업", "에어드랍 커피 — 차분한 지하 카페", "엔트리55 성수 — 외부 음식 반입 가능한 라이브 재즈바"],
+      hashtags: ["#팝업스토어", "#체험", "#재즈바", "#공연"], meta: { time: "저녁", duration: "4~5시간", cost: "5~8만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%84%B1%EC%88%98-%ED%8C%9D%EC%97%85%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { popup: 2, culture: 1, cafe: 1 } },
+    { id: "bukchon", category: "북촌", emoji: "🖼️", title: "북촌 전시 데이트", tagline: "골목을 걸을수록 새로운 전시를 만나는 북촌",
+      desc: "한옥 골목을 걸을수록 새로운 전시가 이어지는, 서울에서 전시 밀도가 가장 높은 동네예요.",
+      spots: ["국립현대미술관 서울 — 대형 기획전부터 소장품까지", "아트선재센터 — 실험적인 동시대 전시", "커피 림 — 한옥 골목 속 카페"],
+      hashtags: ["#전시공연", "#한옥", "#갤러리", "#산책"], meta: { time: "낮", duration: "4~5시간", cost: "5~8만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EB%B6%81%EC%B4%8C-%EC%A0%84%EC%8B%9C-%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { culture: 2, cafe: 1 } },
+    { id: "seongsu-diy", category: "성수체험", emoji: "🧴", title: "성수 이색체험코스", tagline: "직접 만들어보는 성수 데이트",
+      desc: "구경만 하지 않고 직접 만들어 가져가는, 손으로 남기는 성수 데이트예요.",
+      spots: ["POINT of VIEW SEOUL — 감각적인 소품샵 구경", "휩드 하우스 성수 — 나만의 팩 클렌저 만들기"],
+      hashtags: ["#체험", "#원데이클래스", "#소품샵", "#이색데이트"], meta: { time: "낮", duration: "3~4시간", cost: "5~8만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%84%B1%EC%88%98-%EC%9D%B4%EC%83%89%EC%B2%B4%ED%97%98%EC%BD%94%EC%8A%A4.html",
+      tags: { maker: 2, popup: 1 } },
+    { id: "coex", category: "코엑스", emoji: "🐠", title: "코엑스 실내데이트", tagline: "한여름에도 시원하게 즐기는 실내 데이트",
+      desc: "날씨 걱정 없이 식사, 쇼핑, 아쿠아리움까지 한 건물 안에서 끝내는 완전 실내 코스예요.",
+      spots: ["별마당 도서관 — 코엑스 한복판의 대형 서가", "씨라이프 코엑스 아쿠아리움 — 국내 최대급 도심 아쿠아리움", "메가박스 코엑스 — 영화로 마무리"],
+      hashtags: ["#실내데이트", "#아쿠아리움", "#쇼핑", "#여름데이트"], meta: { time: "낮", duration: "하루", cost: "12~15만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EC%BD%94%EC%97%91%EC%8A%A4-%EC%8B%A4%EB%82%B4%EB%8D%B0%EC%9D%B4%ED%8A%B8.html",
+      tags: { ott: 2, popup: 1, foodie: 1 } },
+    { id: "ganghwa", category: "강화도", emoji: "🚗", title: "강화도 드라이브코스", tagline: "서울에서 딱 1시간, 체험콘텐츠 가득한 드라이브",
+      desc: "100년 된 양조장에서 담금주를 빚고 방탈출까지 즐기는, 체험 가득한 근교 드라이브예요.",
+      spots: ["금풍양조장 — 100년 된 양조장에서 담금주 만들기+방탈출 체험", "무해한 어른 — 강화도 소품점", "마니산솥뚜껑닭볶음탕 — 텐트 안 솥뚜껑 요리"],
+      hashtags: ["#드라이브", "#체험데이트", "#이색데이트", "#강화도"], meta: { time: "낮", duration: "반나절", cost: "15~20만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%EA%B0%95%ED%99%94%EB%8F%84-%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C.html",
+      tags: { explorer: 2, maker: 1, foodie: 1 } },
+    { id: "hangang20k", category: "한강산책", emoji: "🚶", title: "한강 2만보 데이트코스", tagline: "한강을 가장 오래, 가장 여유롭게 걷는 산책 데이트",
+      desc: "반포에서 이촌까지, 걷고 또 걸으며 한강을 가장 오래 만나는 산책 데이트예요.",
+      spots: ["세빛섬 튜브스터 — 한강 위 2인용 튜브 보트", "잠수교 도보 횡단 — 차 대신 두 발로 건너기", "이촌역 로컬 포차 — 하루를 마무리하는 한잔"],
+      hashtags: ["#한강", "#산책", "#포차", "#봄가을"], meta: { time: "낮", duration: "반나절", cost: "5~8만원" },
+      sourceUrl: "https://www.stillpoint.kr/places/%ED%95%9C%EA%B0%95-2%EB%A7%8C%EB%B3%B4-%EB%8D%B0%EC%9D%B4%ED%8A%B8%EC%BD%94%EC%8A%A4.html",
+      tags: { activity: 2, healer: 1, alcohol: 1 } }
   ];
   var CONTENT_BY_ID = {};
   CONTENT_POOL.forEach(function (item) { CONTENT_BY_ID[item.id] = item; });
@@ -964,30 +1073,18 @@
       container.innerHTML = pst.slots.map(function (slot, idx) {
         var item = CONTENT_BY_ID[slot.itemId];
         if (!item) return "";
-        var canRetry = !slot.retried && slot.status !== "accepted";
-        var html = '<div class="content-card' + (slot.status === "accepted" ? " accepted" : "") + '">' +
-          '<div class="content-emoji">' + item.emoji + '</div>' +
-          '<div class="content-cat">' + item.category + '</div>' +
-          '<div class="content-title">' + item.title + '</div>' +
-          '<div class="content-desc">' + item.desc + '</div>';
-        if (slot.status === "accepted") {
-          html += '<div class="content-accepted-badge">✅ 이걸로 할래요</div>';
-        } else {
-          html += '<div class="content-card-actions">' +
-            '<button class="btn-content-like" data-slot="' + idx + '">💕 이걸로 할래요</button>' +
-            (canRetry
-              ? '<button class="btn-content-dislike" data-slot="' + idx + '">🔄 다른 걸로</button>'
-              : '<span class="content-final-note">별로면 아래에서 새로 추천받아보세요</span>') +
-            '</div>';
-        }
-        html += '</div>';
-        return html;
+        var accepted = slot.status === "accepted";
+        return '<button type="button" class="content-slot-compact' + (accepted ? " accepted" : "") + '" data-slot="' + idx + '">' +
+          '<span class="csc-emoji">' + item.emoji + '</span>' +
+          '<span class="csc-body"><span class="csc-title">' + item.title + '</span><span class="csc-sub">' + item.tagline + '</span></span>' +
+          (accepted ? '<span class="csc-badge">✅ 확정</span>' : '<span class="csc-arrow">자세히 →</span>') +
+          '</button>';
       }).join("");
 
       var freeLeft = Math.max(0, FREE_LIMIT - pst.slots.length);
       document.getElementById("radar-meta").innerHTML =
         '무료 추천 <b>' + Math.min(pst.slots.length, FREE_LIMIT) + '/' + FREE_LIMIT + '</b> 사용 · 보유 쿠폰 <b>' + pst.coupons + '개</b>' +
-        (pst.dislikedCategories.length ? '<br>제외된 카테고리: ' + pst.dislikedCategories.join(", ") : "");
+        (pst.dislikedCategories.length ? '<br>제외된 코스: ' + pst.dislikedCategories.join(", ") : "");
 
       var addBtn = document.getElementById("btn-add-slot");
       var chargePanel = document.getElementById("charge-panel");
@@ -1002,23 +1099,68 @@
       }
     }
 
-    document.getElementById("content-slots").onclick = function (e) {
-      var likeBtn = e.target.closest(".btn-content-like");
-      var dislikeBtn = e.target.closest(".btn-content-dislike");
-      if (likeBtn) {
-        var idx1 = Number(likeBtn.getAttribute("data-slot"));
-        pst.slots[idx1].status = "accepted";
-        persist(); renderSlots();
-      } else if (dislikeBtn) {
-        var idx2 = Number(dislikeBtn.getAttribute("data-slot"));
-        var slot = pst.slots[idx2];
-        var oldItem = CONTENT_BY_ID[slot.itemId];
-        if (pst.dislikedCategories.indexOf(oldItem.category) === -1) pst.dislikedCategories.push(oldItem.category);
+    function matchExplain(item) {
+      var keys = Object.keys(item.tags).sort(function (a, b) { return item.tags[b] - item.tags[a]; }).slice(0, 2);
+      var names = keys.map(function (k) { return TYPES[k].emoji + " " + TYPES[k].name; });
+      return "두 분의 " + names.join(" · ") + " 성향에 맞춰 골라봤어요";
+    }
+
+    function renderContentDetail(idx) {
+      var slot = pst.slots[idx];
+      var item = CONTENT_BY_ID[slot.itemId];
+      document.getElementById("cd-emoji").textContent = item.emoji;
+      document.getElementById("cd-category").textContent = item.category;
+      document.getElementById("cd-title").textContent = item.title;
+      document.getElementById("cd-tagline").textContent = item.tagline;
+      document.getElementById("cd-match").textContent = "💡 " + matchExplain(item);
+      document.getElementById("cd-meta").innerHTML =
+        '<span class="meta-chip">🕐 ' + item.meta.time + '</span>' +
+        '<span class="meta-chip">⏱️ ' + item.meta.duration + '</span>' +
+        '<span class="meta-chip">💰 ' + item.meta.cost + ' (2인)</span>';
+      document.getElementById("cd-desc").textContent = item.desc;
+      document.getElementById("cd-spots").innerHTML = item.spots.map(function (s) {
+        var parts = s.split(" — ");
+        return '<li><b>' + parts[0] + '</b>' + (parts[1] ? ' — ' + parts[1] : '') + '</li>';
+      }).join("");
+      document.getElementById("cd-hashtags").innerHTML = item.hashtags.map(function (h) {
+        return '<span class="chip">' + h + '</span>';
+      }).join("");
+      document.getElementById("cd-source").href = item.sourceUrl;
+
+      var likeBtn = document.getElementById("btn-content-like");
+      var dislikeBtn = document.getElementById("btn-content-dislike");
+      var finalNote = document.getElementById("cd-final-note");
+      var accepted = slot.status === "accepted";
+      var canRetry = !slot.retried && !accepted;
+
+      likeBtn.textContent = accepted ? "✅ 확정했어요" : "💕 이걸로 할래요";
+      likeBtn.classList.toggle("is-accepted", accepted);
+      dislikeBtn.hidden = !canRetry;
+      finalNote.hidden = accepted || canRetry;
+
+      likeBtn.onclick = function () {
+        slot.status = "accepted";
+        persist(); renderSlots(); renderContentDetail(idx);
+      };
+      dislikeBtn.onclick = function () {
+        if (pst.dislikedCategories.indexOf(item.category) === -1) pst.dislikedCategories.push(item.category);
         var next = pickContent(compat.combined, pst.dislikedCategories, usedItemIds());
         slot.retried = true;
         if (next) { slot.itemId = next.id; }
-        persist(); renderSlots();
-      }
+        persist(); renderSlots(); renderContentDetail(idx);
+      };
+    }
+
+    document.getElementById("content-slots").onclick = function (e) {
+      var btn = e.target.closest(".content-slot-compact");
+      if (!btn) return;
+      var idx = Number(btn.getAttribute("data-slot"));
+      renderContentDetail(idx);
+      showScreen("content");
+    };
+
+    document.getElementById("btn-content-back").onclick = function () {
+      showScreen("couple");
     };
 
     document.getElementById("btn-add-slot").onclick = function () {
@@ -1031,8 +1173,11 @@
       if (!item) { renderSlots(); return; }
       if (needsCoupon) { pst.coupons -= 1; }
       pst.slots.push({ itemId: item.id, retried: false, status: "shown" });
+      var newIdx = pst.slots.length - 1;
       document.getElementById("charge-panel").hidden = true;
       persist(); renderSlots();
+      renderContentDetail(newIdx);
+      showScreen("content");
     };
 
     Array.prototype.forEach.call(document.querySelectorAll(".btn-charge"), function (btn) {
