@@ -270,8 +270,28 @@
   .content-final-note { font-size: 11.5px; color: var(--ink-soft); }
   .content-accepted-badge { font-size: 12.5px; font-weight: 700; color: var(--accent); }
 
-  .radar-btn { width: 100%; }
+  .radar-btn-row { display: flex; gap: 8px; }
+  .radar-btn { flex: 1; width: auto; font-size: 13.5px; padding: 13px 8px; }
   .radar-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+  .ticket-alerts { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
+  .ticket-alerts[hidden] { display: none; }
+  .ticket-alert-card {
+    display: flex; align-items: center; gap: 10px; background: var(--card-soft); border: 1px solid var(--gold);
+    border-radius: 14px; padding: 10px 12px; text-align: left;
+  }
+  .ticket-alert-card .ta-emoji { font-size: 20px; flex: 0 0 auto; }
+  .ticket-alert-card .ta-body { flex: 1; min-width: 0; }
+  .ticket-alert-card .ta-title { font-size: 12.5px; font-weight: 700; color: var(--ink); margin: 0; }
+  .ticket-alert-card .ta-sub { font-size: 11px; color: var(--ink-soft); margin: 2px 0 0; }
+  .ticket-alert-card .ta-link {
+    font-size: 11.5px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 999px;
+    padding: 6px 10px; white-space: nowrap; flex: 0 0 auto;
+  }
+  .ticket-alert-card .ta-dismiss {
+    background: transparent; border: none; color: var(--ink-soft); font-size: 16px; line-height: 1; cursor: pointer; padding: 2px 4px; flex: 0 0 auto;
+  }
+  .ticket-alert-card .ta-dismiss:hover { color: var(--ink); }
 
   .charge-panel {
     margin-top: 12px; background: var(--ground-2); border: 1px dashed var(--line); border-radius: 14px; padding: 14px 16px; text-align: center;
@@ -296,6 +316,7 @@
   .content-slot-compact .csc-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
   .content-slot-compact .csc-arrow { font-size: 13px; color: var(--ink-soft); flex: 0 0 auto; }
   .content-slot-compact .csc-badge { font-size: 11px; font-weight: 700; color: var(--accent); flex: 0 0 auto; }
+  .content-slot-compact .csc-kind { font-size: 10px; font-weight: 700; color: var(--violet); background: var(--ground-2); border-radius: 999px; padding: 3px 9px; flex: 0 0 auto; }
 
   /* content detail screen */
   .content-wrap { flex: 1; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; width: 100%; animation: r-in 0.35s ease; }
@@ -442,6 +463,8 @@
         <div class="chip-group"><p class="chip-group-label">🧲 서로 다른 매력 (보완)</p><div class="chip-row" id="complement-chips"></div></div>
       </div>
 
+      <div class="ticket-alerts" id="ticket-alerts" hidden></div>
+
       <div class="radar-section">
         <p class="radar-title">💌 우리만의 데이트 콘텐츠 레이더</p>
         <div class="area-row">
@@ -451,7 +474,10 @@
         </div>
         <p class="radar-meta" id="radar-meta"></p>
         <div class="content-slots" id="content-slots"></div>
-        <button class="btn-start radar-btn" id="btn-add-slot">추천 받기 ✨</button>
+        <div class="radar-btn-row">
+          <button class="btn-start radar-btn" id="btn-add-slot-course">코스로 추천받기 🗺️</button>
+          <button class="btn-start radar-btn" id="btn-add-slot-restaurant">맛집으로 추천받기 🍽️</button>
+        </div>
         <div class="charge-panel" id="charge-panel" hidden>
           <p class="charge-note">쿠폰이 필요해요 · 1장 500원<br>(지금은 프로토타입이라 실제 결제 없이 충전돼요)</p>
           <div class="charge-options">
@@ -485,7 +511,7 @@
       <div class="content-meta-row" id="cd-meta"></div>
       <p class="content-desc" id="cd-desc"></p>
       <div class="content-spots">
-        <p class="content-spots-title">📍 코스에 포함된 장소</p>
+        <p class="content-spots-title" id="cd-spots-title">📍 코스에 포함된 장소</p>
         <ol class="content-spots-list" id="cd-spots"></ol>
       </div>
       <div class="chip-row content-hashtags" id="cd-hashtags"></div>
@@ -1042,10 +1068,116 @@
   ];
   var CONTENT_BY_ID = {};
   CONTENT_POOL.forEach(function (item) { CONTENT_BY_ID[item.id] = item; });
-  var FREE_LIMIT = 2;
+  var FREE_LIMIT = 3;
 
-  function pickContent(combinedVec, excludeCategories, excludeIds, area) {
-    var candidates = CONTENT_POOL.filter(function (item) {
+  // ---------- couple matching: restaurant pool (specific real venues, web-researched) ----------
+  var RESTAURANT_POOL = [
+    { id: "yeouido-steak", kind: "restaurant", category: "여의도스테이크", region: "영등포·여의도권", emoji: "🥩",
+      title: "르뵈프 여의도", tagline: "여의도에서 즐기는 정통 스테이크하우스",
+      desc: "여의도 직장인들 사이에서 스테이크 맛집으로 꼽히는 곳. 두툼한 스테이크와 사이드가 알차게 나와 기념일 저녁 자리로도 무난해요.",
+      menu: ["안심·등심 스테이크 — 두툼하게 구워내는 시그니처", "곁들임 사이드 — 매쉬드포테이토·그릴 야채"],
+      hashtags: ["#여의도맛집", "#스테이크", "#기념일"], meta: { mealType: "저녁", priceRange: "1인 5~8만원", reservation: "주말 예약 권장" },
+      sourceUrl: "https://www.diningcode.com/list.dc?query=%EC%97%AC%EC%9D%98%EB%8F%84+%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%81%AC",
+      tags: { foodie: 2, alcohol: 1 } },
+    { id: "seongsu-izakaya", kind: "restaurant", category: "성수이자카야", region: "성수·왕십리권", emoji: "🍢",
+      title: "아키야마", tagline: "정성스러운 안주가 술과 잘 어울리는 성수 이자카야",
+      desc: "해물크림짬뽕이 시그니처인 성수동 이자카야. 깔끔한 플레이팅과 정갈한 안주로 방문자들 사이에서 평이 좋아요.",
+      menu: ["해물크림짬뽕 — 시그니처 메뉴", "제철 안주 모둠 — 술과 곁들이기 좋은 구성"],
+      hashtags: ["#성수맛집", "#이자카야", "#안주"], meta: { mealType: "저녁", priceRange: "2인 6~9만원", reservation: "예약 권장" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=J2lyHoV8zFfi",
+      tags: { alcohol: 2, foodie: 1, popup: 1 } },
+    { id: "hongdae-brunch", kind: "restaurant", category: "홍대브런치", region: "홍대·마포권", emoji: "🥐",
+      title: "도트블랭킷 연남점", tagline: "분위기와 비주얼을 모두 챙긴 연남동 브런치",
+      desc: "홍대입구역에서 도보로 갈 수 있는 연남동 브런치 카페. 플레이팅이 예쁘게 나와 사진 남기기도 좋아요.",
+      menu: ["브런치 플레이트 — 에그·토스트 구성", "시그니처 음료"],
+      hashtags: ["#연남동", "#브런치", "#홍대카페"], meta: { mealType: "아침~점심", priceRange: "1인 2~3만원", reservation: "웨이팅 있을 수 있음" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=lEoX1iDIp3KC",
+      tags: { cafe: 2, healer: 1 } },
+    { id: "gangnam-primerib", kind: "restaurant", category: "강남스테이크", region: "강남권", emoji: "🍖",
+      title: "로리스 더 프라임 립", tagline: "무제한 셀프바가 있는 프라임립 전문점",
+      desc: "GT타워 3층에 있는 프라임립 전문 레스토랑. 셀프바가 무제한으로 제공돼 여러 사이드를 함께 즐길 수 있어요.",
+      menu: ["프라임 립 스테이크 — 시그니처 로스트 비프", "셀프바 — 샐러드·수프 무제한"],
+      hashtags: ["#강남맛집", "#프라임립", "#무제한셀프바"], meta: { mealType: "점심~저녁", priceRange: "1인 6~10만원", reservation: "예약 권장" },
+      sourceUrl: "https://himin1000.com/entry/%EA%B0%95%EB%82%A8-%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%81%AC-%EB%A7%9B%EC%A7%91-%EC%B6%94%EC%B2%9C-%ED%8A%B9%EB%B3%84%ED%95%9C-%EB%82%A0-%EA%B0%80%EA%B8%B0-%EC%A2%8B%EC%9D%80-%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%81%AC-%EB%A0%88%EC%8A%A4%ED%86%A0%EB%9E%91",
+      tags: { foodie: 2, culture: 1 } },
+    { id: "euljiro-izakaya", kind: "restaurant", category: "을지로이자카야", region: "종로·중구권", emoji: "🍶",
+      title: "오하이요 을지로3가점", tagline: "가벼운 2차로 딱 좋은 을지로 이자카야",
+      desc: "을지로3가역 근처, 가라아게가 바삭한 걸로 입소문난 이자카야. 안주가 깔끔해서 가볍게 한잔하기 좋아요.",
+      menu: ["가라아게 — 바삭한 튀김옷의 대표 메뉴", "하이볼·사케 — 다양한 주류 구성"],
+      hashtags: ["#을지로", "#이자카야", "#가라아게"], meta: { mealType: "저녁", priceRange: "2인 5~7만원", reservation: "당일 방문 가능" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=Eh0tmB7aNKHK",
+      tags: { alcohol: 2, explorer: 1 } },
+    { id: "bukchon-hanjeongsik", kind: "restaurant", category: "북촌한정식", region: "종로·중구권", emoji: "🍚",
+      title: "목석정", tagline: "한옥 골목의 한식 코스 다이닝",
+      desc: "삼청동 팔판길 골목의 100% 예약제 한식 코스 다이닝. 한입거리부터 솥밥, 디저트까지 이어지는 코스 흐름이 정갈해요.",
+      menu: ["점심 코스 — 한입거리·날것·온기·솥밥·맺음 순 구성", "저녁 코스 — 더 풍성한 구성"],
+      hashtags: ["#삼청동", "#한정식", "#코스요리"], meta: { mealType: "점심~저녁", priceRange: "1인 5~7만원", reservation: "예약 필수(캐치테이블)" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=XrpHo457BNOL",
+      tags: { foodie: 2, culture: 2 } },
+    { id: "itaewon-worldfood", kind: "restaurant", category: "이태원세계음식", region: "용산·이태원권", emoji: "🦞",
+      title: "꾸띠자르당", tagline: "노천테라스에서 즐기는 프랑스식 부야베스",
+      desc: "이태원의 프랑스 요리 전문점으로 부야베스가 대표 메뉴. 노천테라스 자리가 있어 날씨 좋은 날 야외석에서 즐기기 좋아요.",
+      menu: ["부야베스 — 대표 해산물 스튜", "프랑스식 코스 메뉴"],
+      hashtags: ["#이태원맛집", "#프랑스음식", "#부야베스"], meta: { mealType: "저녁", priceRange: "1인 4~6만원", reservation: "예약 권장" },
+      sourceUrl: "https://www.mangoplate.com/top_lists/1776_itaewon_worldfood",
+      tags: { foodie: 2, explorer: 2 } },
+    { id: "jamsil-songni", kind: "restaurant", category: "잠실맛집", region: "송파·잠실권", emoji: "🍝",
+      title: "송리단취향", tagline: "석촌호수 옆 유럽 가정식 캐주얼 다이닝",
+      desc: "해외파 셰프들이 운영하는 유럽 가정식 레스토랑. 석촌호수 바로 옆 송리단길에 있어 산책과 이어가기 좋아요.",
+      menu: ["유럽 가정식 메인 — 계절마다 바뀌는 구성", "와인 페어링 가능"],
+      hashtags: ["#송리단길", "#유럽가정식", "#석촌호수"], meta: { mealType: "점심~저녁", priceRange: "1인 3~5만원", reservation: "주말 예약 권장" },
+      sourceUrl: "https://bmworld.landlord77.com/entry/%EC%9E%A0%EC%8B%A4-%EB%A7%9B%EC%A7%91-BEST-7-%ED%98%84%EC%A7%80%EC%9D%B8%EB%8F%84-%EC%A4%84-%EC%84%9C%EB%8A%94-%EA%B3%B3%EB%A7%8C-%EB%AA%A8%EC%9D%8C-%EC%86%A1%EB%A6%AC%EB%8B%A8%EA%B8%B8-%EB%A1%AF%EB%8D%B0%EC%9B%94%EB%93%9C%EB%AA%B0-%EC%84%9D%EC%B4%8C%ED%98%B8%EC%88%98-%EB%8D%B0%EC%9D%B4%ED%8A%B8",
+      tags: { foodie: 1, healer: 2 } },
+    { id: "garosu-pasta", kind: "restaurant", category: "가로수길파스타", region: "강남·신사권", emoji: "🍕",
+      title: "피키오", tagline: "와인과 어울리는 생면 파스타 맛집",
+      desc: "가로수길에서 생면 파스타와 이탈리안 요리를 파는 곳. 부라타 치즈 마르게리타 피자가 대표 메뉴로 꼽혀요.",
+      menu: ["부라타 치즈 마르게리타 피자 — 대표 메뉴", "생면 파스타·리조또"],
+      hashtags: ["#가로수길", "#파스타", "#와인"], meta: { mealType: "점심~저녁", priceRange: "1인 3~5만원", reservation: "주말 예약 권장" },
+      sourceUrl: "https://www.diningcode.com/list.dc?query=%EA%B0%80%EB%A1%9C%EC%88%98%EA%B8%B8+%ED%8C%8C%EC%8A%A4%ED%83%80",
+      tags: { foodie: 1, alcohol: 1, popup: 1 } },
+    { id: "hannam-brunch", kind: "restaurant", category: "한남동브런치", region: "용산·한남권", emoji: "☕",
+      title: "오아시스 한남점", tagline: "주택 개조 인테리어가 아늑한 한남동 브런치",
+      desc: "1·2층 주택을 개조해 만든 브런치 카페로 내부가 넓고 아늑해요. 데이트·소개팅 장소로도 자주 언급돼요.",
+      menu: ["브런치 세트 — 에그·샐러드 구성", "핸드드립 커피"],
+      hashtags: ["#한남동", "#브런치", "#분위기맛집"], meta: { mealType: "아침~점심", priceRange: "1인 2~3만원", reservation: "주말 웨이팅 가능" },
+      sourceUrl: "https://kr.trip.com/moments/detail/seoul-234-140405820/",
+      tags: { cafe: 2, healer: 1 } }
+  ];
+  var RESTAURANT_BY_ID = {};
+  RESTAURANT_POOL.forEach(function (item) { RESTAURANT_BY_ID[item.id] = item; });
+
+  // ---------- couple matching: ticketing-deadline alerts (exhibitions + concerts, web-researched) ----------
+  var TICKET_ALERTS = [
+    { id: "concert-hwangminhyun-fanmeeting", kind: "concert", emoji: "🎤",
+      title: "황민현 팬미팅 〈도원경〉 - 서울", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
+      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-10", expiresOn: "2026-09-10",
+      summary: "티켓 오픈이 코앞이라 놓치기 쉬워요 — 관심 있다면 예매처 알림 설정 필수",
+      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2 } },
+    { id: "concert-sim-gyuseon-sanctuary", kind: "concert", emoji: "🎤",
+      title: "심규선 단독 콘서트 〈SANCTUARY〉", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
+      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-11", expiresOn: "2026-09-11",
+      summary: "감성 보컬리스트 심규선의 단독 콘서트 예매가 곧 열려요",
+      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2, healer: 1 } },
+    { id: "concert-roykim-roy", kind: "concert", emoji: "🎤",
+      title: "로이킴 LIVE TOUR 〈R:O:Y〉 in SEOUL", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
+      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-11", expiresOn: "2026-09-11",
+      summary: "발라드·어쿠스틱 감성의 로이킴 단독 투어 서울 공연",
+      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2, alcohol: 1 } },
+    { id: "concert-kwonjinah-saveme", kind: "concert", emoji: "🎤",
+      title: "권진아 LIVE TOUR 'SAVE ME' IN SEOUL", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
+      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-15", expiresOn: "2026-09-15",
+      summary: "잔잔한 보컬로 사랑받는 권진아의 단독 투어 서울 공연",
+      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 1, healer: 2 } },
+    { id: "exhibition-goya-sac", kind: "exhibition", emoji: "🖼️",
+      title: "스페인의 거장 고야: 이성이 잠들 때, 괴물이 깨어난다", venue: "예술의전당 한가람미술관 제7전시실", region: "서초·예술의전당권",
+      dateRange: "2026-06-26 ~ 2026-09-30", bookingOpensOn: null, expiresOn: "2026-09-30",
+      summary: "관람 마감이 9월 말이에요 — 입장은 마감 1시간 전(오후 6시)까지",
+      link: "https://www.sac.or.kr/site/main/show/show_view?SN=78392", urgent: false, tags: { culture: 2 } }
+  ];
+
+  // ---------- couple matching: shared scoring/picking helper (courses + restaurants) ----------
+  function pickFromPool(pool, combinedVec, excludeCategories, excludeIds, area) {
+    var candidates = pool.filter(function (item) {
       if (excludeCategories.indexOf(item.category) !== -1) return false;
       if (excludeIds.indexOf(item.id) !== -1) return false;
       return true;
@@ -1065,6 +1197,18 @@
     });
     return best;
   }
+  function pickContent(combinedVec, excludeCategories, excludeIds, area) {
+    return pickFromPool(CONTENT_POOL, combinedVec, excludeCategories, excludeIds, area);
+  }
+  function pickRestaurant(combinedVec, excludeCategories, excludeIds, area) {
+    return pickFromPool(RESTAURANT_POOL, combinedVec, excludeCategories, excludeIds, area);
+  }
+  function pickForKind(kind, combinedVec, excludeCategories, excludeIds, area) {
+    return kind === "restaurant" ? pickRestaurant(combinedVec, excludeCategories, excludeIds, area) : pickContent(combinedVec, excludeCategories, excludeIds, area);
+  }
+  function poolFor(kind) { return kind === "restaurant" ? RESTAURANT_POOL : CONTENT_POOL; }
+  function poolIndexFor(kind) { return kind === "restaurant" ? RESTAURANT_BY_ID : CONTENT_BY_ID; }
+  function findSlotItem(slot) { return poolIndexFor(slot.kind || "course")[slot.itemId]; }
 
   // ---------- couple matching: per-pair local state (coupons, history) ----------
   function hashCode(str) {
@@ -1081,10 +1225,15 @@
       var raw = localStorage.getItem(pairId);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.slots)) return parsed;
+        if (parsed && Array.isArray(parsed.slots)) {
+          if (typeof parsed.area !== "string") parsed.area = "";
+          if (!Array.isArray(parsed.dismissedAlertIds)) parsed.dismissedAlertIds = [];
+          parsed.slots.forEach(function (s) { if (!s.kind) s.kind = "course"; });
+          return parsed;
+        }
       }
     } catch (e) { /* ignore */ }
-    return { coupons: 0, dislikedCategories: [], slots: [], area: "" };
+    return { coupons: 0, dislikedCategories: [], slots: [], area: "", dismissedAlertIds: [] };
   }
   function savePairState(pairId, st) {
     try { localStorage.setItem(pairId, JSON.stringify(st)); } catch (e) { /* ignore */ }
@@ -1128,12 +1277,14 @@
     function renderSlots() {
       var container = document.getElementById("content-slots");
       container.innerHTML = pst.slots.map(function (slot, idx) {
-        var item = CONTENT_BY_ID[slot.itemId];
+        var item = findSlotItem(slot);
         if (!item) return "";
         var accepted = slot.status === "accepted";
+        var kindLabel = slot.kind === "restaurant" ? "🍽️ 맛집" : "🗺️ 코스";
         return '<button type="button" class="content-slot-compact' + (accepted ? " accepted" : "") + '" data-slot="' + idx + '">' +
           '<span class="csc-emoji">' + item.emoji + '</span>' +
           '<span class="csc-body"><span class="csc-title">' + item.title + '</span><span class="csc-sub">' + item.tagline + '</span></span>' +
+          '<span class="csc-kind">' + kindLabel + '</span>' +
           (accepted ? '<span class="csc-badge">✅ 확정</span>' : '<span class="csc-arrow">자세히 →</span>') +
           '</button>';
       }).join("");
@@ -1142,19 +1293,28 @@
       document.getElementById("radar-meta").innerHTML =
         '무료 추천 <b>' + Math.min(pst.slots.length, FREE_LIMIT) + '/' + FREE_LIMIT + '</b> 사용 · 보유 쿠폰 <b>' + pst.coupons + '개</b>' +
         (pst.area ? ' · <b>📍' + pst.area + '</b> 근처 우선' : "") +
-        (pst.dislikedCategories.length ? '<br>제외된 코스: ' + pst.dislikedCategories.join(", ") : "");
+        (pst.dislikedCategories.length ? '<br>제외된 카테고리: ' + pst.dislikedCategories.join(", ") : "");
 
-      var addBtn = document.getElementById("btn-add-slot");
+      var courseBtn = document.getElementById("btn-add-slot-course");
+      var restBtn = document.getElementById("btn-add-slot-restaurant");
       var chargePanel = document.getElementById("charge-panel");
-      var noMore = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area) === null;
-      if (noMore) {
-        addBtn.textContent = "추천할 콘텐츠를 다 보여드렸어요";
-        addBtn.disabled = true;
-        chargePanel.hidden = true;
-      } else {
-        addBtn.disabled = false;
-        addBtn.textContent = freeLeft > 0 ? "추천 받기 ✨ (무료 " + freeLeft + "회 남음)" : "추천 받기 ✨ (쿠폰 1장 사용)";
+      var noMoreCourse = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area) === null;
+      var noMoreRest = pickRestaurant(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area) === null;
+
+      function setupAddBtn(btn, noMore, label) {
+        if (noMore) {
+          btn.textContent = "다 보여드렸어요";
+          btn.disabled = true;
+        } else {
+          btn.disabled = false;
+          btn.textContent = freeLeft > 0 ? label + " (무료 " + freeLeft + "회)" : label + " (쿠폰 1장)";
+        }
       }
+      setupAddBtn(courseBtn, noMoreCourse, "코스로 추천받기 🗺️");
+      setupAddBtn(restBtn, noMoreRest, "맛집으로 추천받기 🍽️");
+      if (noMoreCourse && noMoreRest) { chargePanel.hidden = true; }
+
+      renderTicketAlerts();
     }
 
     function matchExplain(item) {
@@ -1163,20 +1323,58 @@
       return "두 분의 " + names.join(" · ") + " 성향에 맞춰 골라봤어요";
     }
 
+    function renderTicketAlerts() {
+      var container = document.getElementById("ticket-alerts");
+      var areaNeedle = (pst.area || "").trim().toLowerCase();
+      var scored = TICKET_ALERTS.filter(function (a) {
+        return a.urgent && pst.dismissedAlertIds.indexOf(a.id) === -1;
+      }).map(function (a) {
+        var score = 0;
+        Object.keys(a.tags || {}).forEach(function (k) { score += (compat.combined[k] || 0) * a.tags[k]; });
+        var haystack = (a.venue + " " + a.region).toLowerCase();
+        if (areaNeedle && haystack.indexOf(areaNeedle) !== -1) score += 40;
+        return { item: a, score: score };
+      }).sort(function (x, y) { return y.score - x.score; }).slice(0, 3);
+
+      if (!scored.length) { container.innerHTML = ""; container.hidden = true; return; }
+      container.hidden = false;
+      container.innerHTML = scored.map(function (s) {
+        var a = s.item;
+        return '<div class="ticket-alert-card">' +
+          '<span class="ta-emoji">' + a.emoji + '</span>' +
+          '<div class="ta-body"><p class="ta-title">' + a.title + '</p>' +
+          '<p class="ta-sub">' + a.summary + '</p></div>' +
+          '<a class="ta-link" href="' + a.link + '" target="_blank" rel="noopener">보기</a>' +
+          '<button type="button" class="ta-dismiss" data-dismiss="' + a.id + '" aria-label="닫기">×</button>' +
+          '</div>';
+      }).join("");
+    }
+    document.getElementById("ticket-alerts").onclick = function (e) {
+      var dismissBtn = e.target.closest(".ta-dismiss");
+      if (!dismissBtn) return;
+      pst.dismissedAlertIds.push(dismissBtn.getAttribute("data-dismiss"));
+      persist(); renderTicketAlerts();
+    };
+
     function renderContentDetail(idx) {
       var slot = pst.slots[idx];
-      var item = CONTENT_BY_ID[slot.itemId];
+      var item = findSlotItem(slot);
+      var isRestaurant = slot.kind === "restaurant";
       document.getElementById("cd-emoji").textContent = item.emoji;
       document.getElementById("cd-category").textContent = item.category + " · " + item.region;
       document.getElementById("cd-title").textContent = item.title;
       document.getElementById("cd-tagline").textContent = item.tagline;
       document.getElementById("cd-match").textContent = "💡 " + matchExplain(item);
-      document.getElementById("cd-meta").innerHTML =
-        '<span class="meta-chip">🕐 ' + item.meta.time + '</span>' +
-        '<span class="meta-chip">⏱️ ' + item.meta.duration + '</span>' +
-        '<span class="meta-chip">💰 ' + item.meta.cost + ' (2인)</span>';
+      document.getElementById("cd-meta").innerHTML = isRestaurant
+        ? '<span class="meta-chip">🍴 ' + item.meta.mealType + '</span>' +
+          '<span class="meta-chip">💰 ' + item.meta.priceRange + '</span>' +
+          '<span class="meta-chip">📅 ' + item.meta.reservation + '</span>'
+        : '<span class="meta-chip">🕐 ' + item.meta.time + '</span>' +
+          '<span class="meta-chip">⏱️ ' + item.meta.duration + '</span>' +
+          '<span class="meta-chip">💰 ' + item.meta.cost + ' (2인)</span>';
       document.getElementById("cd-desc").textContent = item.desc;
-      document.getElementById("cd-spots").innerHTML = item.spots.map(function (s) {
+      document.getElementById("cd-spots-title").textContent = isRestaurant ? "🍽️ 대표 메뉴" : "📍 코스에 포함된 장소";
+      document.getElementById("cd-spots").innerHTML = (isRestaurant ? item.menu : item.spots).map(function (s) {
         var parts = s.split(" — ");
         return '<li><b>' + parts[0] + '</b>' + (parts[1] ? ' — ' + parts[1] : '') + '</li>';
       }).join("");
@@ -1202,7 +1400,7 @@
       };
       dislikeBtn.onclick = function () {
         if (pst.dislikedCategories.indexOf(item.category) === -1) pst.dislikedCategories.push(item.category);
-        var next = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
+        var next = pickForKind(slot.kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
         slot.retried = true;
         if (next) { slot.itemId = next.id; }
         persist(); renderSlots(); renderContentDetail(idx);
@@ -1221,22 +1419,24 @@
       showScreen("couple");
     };
 
-    document.getElementById("btn-add-slot").onclick = function () {
+    function addSlot(kind) {
       var needsCoupon = pst.slots.length >= FREE_LIMIT;
       if (needsCoupon && pst.coupons <= 0) {
         document.getElementById("charge-panel").hidden = false;
         return;
       }
-      var item = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
+      var item = pickForKind(kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
       if (!item) { renderSlots(); return; }
       if (needsCoupon) { pst.coupons -= 1; }
-      pst.slots.push({ itemId: item.id, retried: false, status: "shown" });
+      pst.slots.push({ itemId: item.id, kind: kind, retried: false, status: "shown" });
       var newIdx = pst.slots.length - 1;
       document.getElementById("charge-panel").hidden = true;
       persist(); renderSlots();
       renderContentDetail(newIdx);
       showScreen("content");
-    };
+    }
+    document.getElementById("btn-add-slot-course").onclick = function () { addSlot("course"); };
+    document.getElementById("btn-add-slot-restaurant").onclick = function () { addSlot("restaurant"); };
 
     Array.prototype.forEach.call(document.querySelectorAll(".btn-charge"), function (btn) {
       btn.onclick = function () {
