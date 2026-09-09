@@ -823,7 +823,7 @@
       var innerRing = '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r * 0.8).toFixed(1) + '" fill="none" stroke="' + g.shine + '" stroke-opacity="0.5" stroke-width="' + (r * 0.05).toFixed(1) + '"/>';
       var shineCx = cx - r * 0.32, shineCy = cy - r * 0.35;
       var shine = '<ellipse cx="' + shineCx.toFixed(1) + '" cy="' + shineCy.toFixed(1) + '" rx="' + (r * 0.3).toFixed(1) + '" ry="' + (r * 0.16).toFixed(1) + '" fill="' + g.shine + '" opacity="0.7" transform="rotate(-30 ' + shineCx.toFixed(1) + ' ' + shineCy.toFixed(1) + ')"/>';
-      var icon = BADGE_ICONS[modKey](cx, cy, r * 0.76);
+      var icon = '<text x="' + cx.toFixed(1) + '" y="' + (cy + r * 0.06).toFixed(1) + '" font-size="' + (r * 1.28).toFixed(1) + '" text-anchor="middle" dominant-baseline="central">' + TYPES[modKey].emoji + '</text>';
       return ribbons + halo + disc + innerRing + shine + icon;
     }
 
