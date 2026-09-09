@@ -764,6 +764,7 @@
     }
   };
 
+  var svgMedalUid = 0;
   function buildCharacterSVG(topKey, modKeys) {
     var top = TYPES[topKey];
     var isTipsy = modKeys.indexOf("alcohol") !== -1;
@@ -791,19 +792,52 @@
     }
     var sparkles = sparkle(vbW * 0.07, vbH * 0.08, vbW * 0.032) + sparkle(vbW * 0.93, vbH * 0.92, vbW * 0.026);
 
-    function badge(cx, cy, r, color, modKey) {
-      var ring = Math.max(2, r * 0.12);
-      return '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + color + '" style="stroke:var(--card);stroke-width:' + ring.toFixed(1) + '"/>' + BADGE_ICONS[modKey](cx, cy, r, color);
+    svgMedalUid++;
+    var uid = svgMedalUid;
+    var TIERS = {
+      gold: { id: "medalGold" + uid, stops: ["#FFF6D2", "#FFDD66", "#F0AC1E", "#B87A0A"], ring: "#8A5A00", ribbon: "#D68F0B", shine: "#FFFDE9" },
+      silver: { id: "medalSilver" + uid, stops: ["#FFFFFF", "#E7EAEE", "#B9C0C9", "#8A939E"], ring: "#5D6570", ribbon: "#9AA3AD", shine: "#FFFFFF" },
+      bronze: { id: "medalBronze" + uid, stops: ["#F5D2AE", "#DA9A5C", "#B06B33", "#7A4419"], ring: "#5A2C0F", ribbon: "#A8683A", shine: "#FFEBD2" }
+    };
+    var medalDefs = '<defs>' + Object.keys(TIERS).map(function (t) {
+      var g = TIERS[t];
+      return '<radialGradient id="' + g.id + '" cx="35%" cy="30%" r="75%">' +
+        '<stop offset="0%" stop-color="' + g.stops[0] + '"/>' +
+        '<stop offset="38%" stop-color="' + g.stops[1] + '"/>' +
+        '<stop offset="72%" stop-color="' + g.stops[2] + '"/>' +
+        '<stop offset="100%" stop-color="' + g.stops[3] + '"/>' +
+      '</radialGradient>';
+    }).join("") + '</defs>';
+
+    function medal(cx, cy, r, tier, modKey) {
+      var g = TIERS[tier];
+      var ringW = Math.max(2, r * 0.11);
+      var ribbonW = r * 0.32, ribbonLen = r * 0.78;
+      var lx = cx - r * 0.32, rx = cx + r * 0.32;
+      var ribbonTop = cy + r * 0.55;
+      var ribbons =
+        '<polygon points="' + (lx - ribbonW / 2).toFixed(1) + ',' + ribbonTop.toFixed(1) + ' ' + (lx + ribbonW / 2).toFixed(1) + ',' + ribbonTop.toFixed(1) + ' ' + lx.toFixed(1) + ',' + (ribbonTop + ribbonLen).toFixed(1) + '" fill="' + g.ribbon + '"/>' +
+        '<polygon points="' + (rx - ribbonW / 2).toFixed(1) + ',' + ribbonTop.toFixed(1) + ' ' + (rx + ribbonW / 2).toFixed(1) + ',' + ribbonTop.toFixed(1) + ' ' + rx.toFixed(1) + ',' + (ribbonTop + ribbonLen).toFixed(1) + '" fill="' + g.ribbon + '"/>';
+      var halo = tier === "gold" ? '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r * 1.32).toFixed(1) + '" fill="' + g.stops[1] + '" opacity="0.28"/>' : "";
+      var disc = '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="url(#' + g.id + ')" style="stroke:' + g.ring + ';stroke-width:' + ringW.toFixed(1) + '"/>';
+      var innerRing = '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r * 0.8).toFixed(1) + '" fill="none" stroke="' + g.shine + '" stroke-opacity="0.5" stroke-width="' + (r * 0.05).toFixed(1) + '"/>';
+      var shineCx = cx - r * 0.32, shineCy = cy - r * 0.35;
+      var shine = '<ellipse cx="' + shineCx.toFixed(1) + '" cy="' + shineCy.toFixed(1) + '" rx="' + (r * 0.3).toFixed(1) + '" ry="' + (r * 0.16).toFixed(1) + '" fill="' + g.shine + '" opacity="0.7" transform="rotate(-30 ' + shineCx.toFixed(1) + ' ' + shineCy.toFixed(1) + ')"/>';
+      var icon = BADGE_ICONS[modKey](cx, cy, r * 0.76);
+      return ribbons + halo + disc + innerRing + shine + icon;
     }
-    var badgePos = [{ x: vbW * 0.855, y: vbH * 0.135, r: vbW * 0.088 }, { x: vbW * 0.145, y: vbH * 0.86, r: vbW * 0.072 }];
-    var badges = modKeys.slice(0, 2).map(function (k, i) {
-      var m = TYPES[k], p = badgePos[i];
-      return badge(p.x, p.y, p.r, m.color, k);
-    }).join("");
+
+    var goldPos = { x: vbW * 0.5, y: vbH * 0.075, r: vbW * 0.098 };
+    var silverPos = { x: vbW * 0.86, y: vbH * 0.16, r: vbW * 0.08 };
+    var bronzePos = { x: vbW * 0.14, y: vbH * 0.86, r: vbW * 0.066 };
+
+    var medals = medal(goldPos.x, goldPos.y, goldPos.r, "gold", topKey);
+    if (modKeys[0]) { medals += medal(silverPos.x, silverPos.y, silverPos.r, "silver", modKeys[0]); }
+    if (modKeys[1]) { medals += medal(bronzePos.x, bronzePos.y, bronzePos.r, "bronze", modKeys[1]); }
 
     return (
       '<svg viewBox="0 0 ' + vbW + ' ' + vbH + '" width="220" height="220" role="img" aria-label="결과 동물 캐릭터">' +
-        sparkles + imageGroup + badges +
+        medalDefs + sparkles + imageGroup + medals +
       '</svg>'
     );
   }
