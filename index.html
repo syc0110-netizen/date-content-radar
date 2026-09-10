@@ -256,6 +256,16 @@
   .area-row .area-save { padding: 8px 14px; font-size: 12.5px; white-space: nowrap; }
   .area-set-note { font-size: 11.5px; color: var(--violet); margin: -4px 0 12px; text-align: center; }
 
+  .age-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -2px 0 14px; }
+  .age-row-label { font-size: 12px; color: var(--ink-soft); margin-right: 2px; }
+  .age-pill {
+    font-family: inherit; font-size: 12px; color: var(--ink-soft); cursor: pointer;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 11px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .age-pill:hover { border-color: var(--accent); }
+  .age-pill.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+
   .content-slots { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
   .content-card {
     background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
@@ -478,6 +488,15 @@
           <span class="area-icon">📍</span>
           <input type="text" id="area-input" placeholder="어디 근처에서 만나요? (예: 여의도, 홍대, 강남)" maxlength="20">
           <button class="btn-secondary area-save" id="btn-area-save">설정</button>
+        </div>
+        <div class="age-row" id="age-row">
+          <span class="age-row-label">🎂 우리 나이대</span>
+          <button type="button" class="age-pill" data-age="10">10대</button>
+          <button type="button" class="age-pill" data-age="20">20대</button>
+          <button type="button" class="age-pill" data-age="30">30대</button>
+          <button type="button" class="age-pill" data-age="40">40대</button>
+          <button type="button" class="age-pill" data-age="50">50대</button>
+          <button type="button" class="age-pill" data-age="60">60대</button>
         </div>
         <p class="radar-meta" id="radar-meta"></p>
         <div class="content-slots" id="content-slots"></div>
@@ -1217,7 +1236,15 @@
   ];
 
   // ---------- couple matching: shared scoring/picking helper (courses + restaurants) ----------
-  function pickFromPool(pool, combinedVec, excludeCategories, excludeIds, area) {
+  // 나이대별 "요즘 감성" 가중치 — 나이가 있는 커플일수록 트렌디/액티브한 콘텐츠를 상단으로 끌어올린다
+  var TYPE_YOUTH = { activity: 1, alcohol: 0.4, foodie: 0, cafe: 0.5, ott: 0.4, popup: 1, explorer: 0.5, culture: -0.4, maker: 0.6, healer: -0.4 };
+  var AGE_YOUTH_PUSH = { "10": 3, "20": 5, "30": 9, "40": 16, "50": 22, "60": 26 };
+  function youthIndex(tags) {
+    var num = 0, den = 0;
+    Object.keys(tags || {}).forEach(function (k) { var w = tags[k]; den += w; num += (TYPE_YOUTH[k] || 0) * w; });
+    return den > 0 ? num / den : 0;
+  }
+  function pickFromPool(pool, combinedVec, excludeCategories, excludeIds, area, ageBand) {
     var candidates = pool.filter(function (item) {
       if (excludeCategories.indexOf(item.category) !== -1) return false;
       if (excludeIds.indexOf(item.id) !== -1) return false;
@@ -1233,19 +1260,21 @@
         var haystack = (item.region + " " + item.category + " " + item.title).toLowerCase();
         if (haystack.indexOf(areaNeedle) !== -1) score += 60;
       }
+      var youthPush = AGE_YOUTH_PUSH[ageBand] || 0;
+      if (youthPush) score += youthPush * Math.max(0, youthIndex(item.tags));
       score += Math.random() * 6;
       if (score > bestScore) { bestScore = score; best = item; }
     });
     return best;
   }
-  function pickContent(combinedVec, excludeCategories, excludeIds, area) {
-    return pickFromPool(CONTENT_POOL, combinedVec, excludeCategories, excludeIds, area);
+  function pickContent(combinedVec, excludeCategories, excludeIds, area, ageBand) {
+    return pickFromPool(CONTENT_POOL, combinedVec, excludeCategories, excludeIds, area, ageBand);
   }
-  function pickRestaurant(combinedVec, excludeCategories, excludeIds, area) {
-    return pickFromPool(RESTAURANT_POOL, combinedVec, excludeCategories, excludeIds, area);
+  function pickRestaurant(combinedVec, excludeCategories, excludeIds, area, ageBand) {
+    return pickFromPool(RESTAURANT_POOL, combinedVec, excludeCategories, excludeIds, area, ageBand);
   }
-  function pickForKind(kind, combinedVec, excludeCategories, excludeIds, area) {
-    return kind === "restaurant" ? pickRestaurant(combinedVec, excludeCategories, excludeIds, area) : pickContent(combinedVec, excludeCategories, excludeIds, area);
+  function pickForKind(kind, combinedVec, excludeCategories, excludeIds, area, ageBand) {
+    return kind === "restaurant" ? pickRestaurant(combinedVec, excludeCategories, excludeIds, area, ageBand) : pickContent(combinedVec, excludeCategories, excludeIds, area, ageBand);
   }
   function poolFor(kind) { return kind === "restaurant" ? RESTAURANT_POOL : CONTENT_POOL; }
   function poolIndexFor(kind) { return kind === "restaurant" ? RESTAURANT_BY_ID : CONTENT_BY_ID; }
@@ -1268,13 +1297,14 @@
         var parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.slots)) {
           if (typeof parsed.area !== "string") parsed.area = "";
+          if (typeof parsed.ageBand !== "string") parsed.ageBand = "";
           if (!Array.isArray(parsed.dismissedAlertIds)) parsed.dismissedAlertIds = [];
           parsed.slots.forEach(function (s) { if (!s.kind) s.kind = "course"; });
           return parsed;
         }
       }
     } catch (e) { /* ignore */ }
-    return { coupons: 0, dislikedCategories: [], slots: [], area: "", dismissedAlertIds: [] };
+    return { coupons: 0, dislikedCategories: [], slots: [], area: "", ageBand: "", dismissedAlertIds: [] };
   }
   function savePairState(pairId, st) {
     try { localStorage.setItem(pairId, JSON.stringify(st)); } catch (e) { /* ignore */ }
@@ -1306,6 +1336,7 @@
     var pairId = pairKey(codeA, codeB);
     var pst = loadPairState(pairId);
     if (typeof pst.area !== "string") pst.area = "";
+    if (typeof pst.ageBand !== "string") pst.ageBand = "";
     function persist() { savePairState(pairId, pst); }
     function usedItemIds() { return pst.slots.map(function (s) { return s.itemId; }); }
 
@@ -1314,6 +1345,23 @@
       pst.area = document.getElementById("area-input").value.trim();
       persist(); renderSlots();
     };
+
+    (function () {
+      var ageRow = document.getElementById("age-row");
+      function paintAge() {
+        Array.prototype.forEach.call(ageRow.querySelectorAll(".age-pill"), function (b) {
+          b.classList.toggle("on", b.getAttribute("data-age") === pst.ageBand);
+        });
+      }
+      paintAge();
+      ageRow.onclick = function (e) {
+        var b = e.target.closest(".age-pill");
+        if (!b) return;
+        var v = b.getAttribute("data-age");
+        pst.ageBand = (pst.ageBand === v) ? "" : v;
+        persist(); paintAge(); renderSlots();
+      };
+    })();
 
     function renderSlots() {
       var container = document.getElementById("content-slots");
@@ -1334,13 +1382,14 @@
       document.getElementById("radar-meta").innerHTML =
         '무료 추천 <b>' + Math.min(pst.slots.length, FREE_LIMIT) + '/' + FREE_LIMIT + '</b> 사용 · 보유 쿠폰 <b>' + pst.coupons + '개</b>' +
         (pst.area ? ' · <b>📍' + pst.area + '</b> 근처 우선' : "") +
+        (pst.ageBand ? ' · <b>' + pst.ageBand + '대</b> 취향 반영' : "") +
         (pst.dislikedCategories.length ? '<br>제외된 카테고리: ' + pst.dislikedCategories.join(", ") : "");
 
       var courseBtn = document.getElementById("btn-add-slot-course");
       var restBtn = document.getElementById("btn-add-slot-restaurant");
       var chargePanel = document.getElementById("charge-panel");
-      var noMoreCourse = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area) === null;
-      var noMoreRest = pickRestaurant(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area) === null;
+      var noMoreCourse = pickContent(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area, pst.ageBand) === null;
+      var noMoreRest = pickRestaurant(compat.combined, pst.dislikedCategories, usedItemIds(), pst.area, pst.ageBand) === null;
 
       function setupAddBtn(btn, noMore, label) {
         if (noMore) {
@@ -1361,7 +1410,9 @@
     function matchExplain(item) {
       var keys = Object.keys(item.tags).sort(function (a, b) { return item.tags[b] - item.tags[a]; }).slice(0, 2);
       var names = keys.map(function (k) { return TYPES[k].emoji + " " + TYPES[k].name; });
-      return "두 분의 " + names.join(" · ") + " 성향에 맞춰 골라봤어요";
+      var base = "두 분의 " + names.join(" · ") + " 성향에 맞춰 골라봤어요";
+      if (pst.ageBand && youthIndex(item.tags) > 0.3) base += " · " + pst.ageBand + "대도 요즘 이렇게 즐겨요";
+      return base;
     }
 
     function renderTicketAlerts() {
@@ -1374,6 +1425,8 @@
         Object.keys(a.tags || {}).forEach(function (k) { score += (compat.combined[k] || 0) * a.tags[k]; });
         var haystack = (a.venue + " " + a.region).toLowerCase();
         if (areaNeedle && haystack.indexOf(areaNeedle) !== -1) score += 40;
+        var agePush = AGE_YOUTH_PUSH[pst.ageBand] || 0;
+        if (agePush) score += agePush * Math.max(0, youthIndex(a.tags)) * 0.5;
         return { item: a, score: score };
       }).sort(function (x, y) { return y.score - x.score; }).slice(0, 3);
 
@@ -1441,7 +1494,7 @@
       };
       dislikeBtn.onclick = function () {
         if (pst.dislikedCategories.indexOf(item.category) === -1) pst.dislikedCategories.push(item.category);
-        var next = pickForKind(slot.kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
+        var next = pickForKind(slot.kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area, pst.ageBand);
         slot.retried = true;
         if (next) { slot.itemId = next.id; }
         persist(); renderSlots(); renderContentDetail(idx);
@@ -1466,7 +1519,7 @@
         document.getElementById("charge-panel").hidden = false;
         return;
       }
-      var item = pickForKind(kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area);
+      var item = pickForKind(kind, compat.combined, pst.dislikedCategories, usedItemIds(), pst.area, pst.ageBand);
       if (!item) { renderSlots(); return; }
       if (needsCoupon) { pst.coupons -= 1; }
       pst.slots.push({ itemId: item.id, kind: kind, retried: false, status: "shown" });
