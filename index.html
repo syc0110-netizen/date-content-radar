@@ -179,6 +179,46 @@
   .btn-secondary:hover { border-color: var(--accent); }
   .btn-secondary:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
 
+  /* clickable type summary + modal overlays (type detail / demographics / stats) */
+  .last-result.clickable, .couple-person.clickable { cursor: pointer; }
+  .last-result.clickable:hover { border-color: var(--accent); color: var(--ink); }
+  .last-result .lr-more { display: block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--accent); }
+  .couple-person.clickable:hover .couple-name { color: var(--accent); }
+  .couple-person.clickable:focus-visible, .last-result.clickable:focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; border-radius: 12px; }
+  .couple-tap-hint { font-size: 11.5px; color: var(--ink-soft); margin: 2px 0 12px; }
+
+  .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(18,10,28,0.64); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; animation: mo-in 0.16s ease; }
+  .modal-overlay[hidden] { display: none; }
+  @keyframes mo-in { from { opacity: 0; } to { opacity: 1; } }
+  .modal-card { position: relative; width: 100%; max-width: 384px; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 30px 24px 24px; box-shadow: 0 24px 52px -18px rgba(0,0,0,0.55); animation: r-in 0.26s ease; }
+  .modal-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--card-soft); color: var(--ink-soft); font-size: 17px; line-height: 1; cursor: pointer; }
+  .modal-close:hover { border-color: var(--accent); color: var(--ink); }
+  .modal-card .char-visual { margin-bottom: 6px; }
+  .modal-card .result-name { font-size: 24px; }
+  .td-compat { display: flex; gap: 10px; margin-top: 18px; }
+  .td-compat .compat-box { flex: 1; }
+
+  .demo-title { font-family: 'Do Hyeon', sans-serif; font-weight: 400; font-size: 19px; margin: 0 0 6px; text-align: center; }
+  .demo-sub { font-size: 12.5px; color: var(--ink-soft); text-align: center; margin: 0 0 18px; }
+  .demo-group { margin-bottom: 14px; }
+  .demo-label { display: block; font-size: 11.5px; font-weight: 700; color: var(--violet); letter-spacing: 0.04em; margin-bottom: 7px; }
+  .demo-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .demo-pill { font-family: inherit; font-size: 12.5px; color: var(--ink-soft); cursor: pointer; background: var(--card-soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; transition: background .15s, color .15s, border-color .15s; }
+  .demo-pill:hover { border-color: var(--accent); }
+  .demo-pill.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  .demo-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 20px; }
+  .demo-actions .btn-start { width: 100%; }
+  .btn-text { background: none; border: none; color: var(--ink-soft); font-family: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 4px; }
+  .btn-text:hover { color: var(--ink); }
+  .stats-note { font-size: 12px; color: var(--violet); text-align: center; margin: 0 0 16px; }
+  .stats-bars { display: flex; flex-direction: column; gap: 7px; margin: 4px 0 14px; }
+  .stats-bars .bar-row { grid-template-columns: 108px 1fr 44px; }
+  .stats-row .bar-label { display: flex; align-items: center; gap: 4px; }
+  .stats-mine { font-size: 9px; font-weight: 800; background: var(--violet); color: #fff; border-radius: 999px; padding: 1px 5px; }
+  .stats-foot { font-size: 12px; color: var(--ink-soft); text-align: center; margin: 0; }
+  .intro-stats-btn { margin: -18px auto 26px; display: block; }
+  @media (max-width: 380px) { .stats-bars .bar-row { grid-template-columns: 88px 1fr 40px; } }
+
   footer.site { margin-top: 40px; text-align: center; font-size: 12px; color: var(--ink-soft); }
 
   @media (max-width: 380px) {
@@ -293,6 +333,7 @@
 
   .ticket-alerts { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
   .ticket-alerts[hidden] { display: none; }
+  .ticket-alerts[hidden] { display: none; }
   .ticket-alert-card {
     display: flex; align-items: center; gap: 10px; background: var(--card-soft); border: 1px solid var(--gold);
     border-radius: 14px; padding: 10px 12px; text-align: left;
@@ -391,6 +432,7 @@
       <button class="btn-start" id="btn-start">테스트 시작하기</button>
       <p class="cta-note">결과는 저장되지 않고 이 화면에서만 보여요</p>
     </div>
+    <button class="btn-text intro-stats-btn" id="btn-stats-intro">📊 사람들은 어떤 유형이 많을까?</button>
   </section>
 
   <section class="screen" id="screen-quiz">
@@ -444,6 +486,7 @@
         <p class="share-copied" id="share-copied">링크를 복사했어요! 카카오톡 등으로 애인에게 보내보세요.</p>
       </div>
       <div class="result-actions">
+        <button class="btn-secondary" id="btn-stats">📊 유형 통계 보기</button>
         <button class="btn-secondary" id="btn-retry">다시 하기</button>
       </div>
     </div>
@@ -474,6 +517,7 @@
         <div class="couple-heart">💗</div>
         <div class="couple-person"><div class="couple-visual" id="couple-visual-b"></div><div class="couple-name" id="couple-name-b"></div></div>
       </div>
+      <p class="couple-tap-hint">👆 캐릭터를 누르면 각자 유형 상세를 볼 수 있어요</p>
       <div class="compat-ring" id="compat-ring"><span id="compat-pct-num"></span><span class="compat-ring-label">궁합</span></div>
       <div class="compat-chips">
         <div class="chip-group"><p class="chip-group-label">✨ 둘 다 좋아하는 것</p><div class="chip-row" id="good-chips"></div></div>
@@ -552,6 +596,82 @@
     </div>
   </section>
 
+  <div class="modal-overlay" id="type-detail-overlay" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="유형 상세">
+      <button class="modal-close" id="type-detail-close" aria-label="닫기">×</button>
+      <p class="result-tag" id="td-tag">당신을 닮은 동물은</p>
+      <div class="char-visual" id="td-visual"></div>
+      <h2 class="result-name" id="td-name"></h2>
+      <p class="result-blend" id="td-blend"></p>
+      <p class="result-desc" id="td-desc"></p>
+      <div class="bars" id="td-bars"></div>
+      <div class="td-compat">
+        <div class="compat-box"><div class="compat-label">찰떡궁합</div><div class="compat-value good" id="td-good"></div></div>
+        <div class="compat-box"><div class="compat-label">정반대</div><div class="compat-value bad" id="td-bad"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="demo-overlay" hidden>
+    <div class="modal-card demo-card" role="dialog" aria-modal="true" aria-label="통계 참여">
+      <p class="demo-title">📊 통계에 참여할래요?</p>
+      <p class="demo-sub">성별·나이대별로 어떤 유형이 많이 나오는지 함께 보여드려요. 이름·답변은 저장하지 않아요.</p>
+      <div class="demo-group">
+        <span class="demo-label">성별</span>
+        <div class="demo-pills" id="demo-gender">
+          <button type="button" class="demo-pill" data-g="f">여성</button>
+          <button type="button" class="demo-pill" data-g="m">남성</button>
+          <button type="button" class="demo-pill" data-g="x">기타·비공개</button>
+        </div>
+      </div>
+      <div class="demo-group">
+        <span class="demo-label">나이대</span>
+        <div class="demo-pills" id="demo-age">
+          <button type="button" class="demo-pill" data-a="10">10대</button>
+          <button type="button" class="demo-pill" data-a="20">20대</button>
+          <button type="button" class="demo-pill" data-a="30">30대</button>
+          <button type="button" class="demo-pill" data-a="40">40대</button>
+          <button type="button" class="demo-pill" data-a="50">50대</button>
+          <button type="button" class="demo-pill" data-a="60">60대</button>
+        </div>
+      </div>
+      <div class="demo-actions">
+        <button class="btn-start" id="demo-submit">이 정보로 통계 보기</button>
+        <button class="btn-text" id="demo-skip">그냥 결과만 볼게요</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="stats-overlay" hidden>
+    <div class="modal-card stats-card" role="dialog" aria-modal="true" aria-label="유형 통계">
+      <button class="modal-close" id="stats-close" aria-label="닫기">×</button>
+      <p class="demo-title">📊 데이트 MBTI 통계</p>
+      <p class="stats-note" id="stats-note"></p>
+      <div class="demo-group">
+        <span class="demo-label">성별</span>
+        <div class="demo-pills" id="stats-f-gender">
+          <button type="button" class="demo-pill on" data-g="">전체</button>
+          <button type="button" class="demo-pill" data-g="f">여성</button>
+          <button type="button" class="demo-pill" data-g="m">남성</button>
+        </div>
+      </div>
+      <div class="demo-group">
+        <span class="demo-label">나이대</span>
+        <div class="demo-pills" id="stats-f-age">
+          <button type="button" class="demo-pill on" data-a="">전체</button>
+          <button type="button" class="demo-pill" data-a="10">10대</button>
+          <button type="button" class="demo-pill" data-a="20">20대</button>
+          <button type="button" class="demo-pill" data-a="30">30대</button>
+          <button type="button" class="demo-pill" data-a="40">40대</button>
+          <button type="button" class="demo-pill" data-a="50">50대</button>
+          <button type="button" class="demo-pill" data-a="60">60대</button>
+        </div>
+      </div>
+      <div class="stats-bars" id="stats-bars"></div>
+      <p class="stats-foot" id="stats-foot"></p>
+    </div>
+  </div>
+
   <footer class="site">재미로 보는 유형 테스트예요 — 과학적 근거는 없어요 🙃</footer>
 </div>
 
@@ -615,7 +735,7 @@
 
   var LS_KEY = "date_mbti_last_result_v2";
 
-  var state = { idx: 0, answers: new Array(QUESTIONS.length).fill(null), lastPayload: null };
+  var state = { idx: 0, answers: new Array(QUESTIONS.length).fill(null), lastPayload: null, demo: { g: "", a: "" } };
   var partnerData = null;
 
   var screens = {
@@ -650,6 +770,15 @@
     var box = document.getElementById("last-result");
     box.hidden = false;
     box.innerHTML = '<span style="font-size:22px">' + (data.emoji || "🎭") + '</span><span>지난 결과는 <b>' + data.title + '</b>였어요 — 오늘은 어떨까요?</span>';
+    if (data.payload && data.payload.t && TYPES[data.payload.t] && Array.isArray(data.payload.s)) {
+      box.classList.add("clickable");
+      box.setAttribute("role", "button");
+      box.setAttribute("tabindex", "0");
+      box.innerHTML += '<span class="lr-more">지난 유형 다시 보기 →</span>';
+      var openLast = function () { showTypeDetail(data.payload, "지난 결과"); };
+      box.addEventListener("click", openLast);
+      box.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLast(); } });
+    }
   })();
 
   function startQuiz() {
@@ -692,7 +821,7 @@
       state.idx += 1;
       renderQuestion();
     } else {
-      finish();
+      askDemographics(finish);
     }
   }
 
@@ -939,6 +1068,7 @@
     var payload = { n: compositeTitle, t: topKey, m: modKeys, s: TYPE_ORDER.map(function (k) { return Math.round(pct[k]); }) };
     state.lastPayload = payload;
     saveLastResult(compositeTitle, top.emoji, payload);
+    recordStatSample(topKey);
 
     if (partnerData) {
       document.getElementById("partner-cta-name").textContent = partnerData.n;
@@ -962,6 +1092,190 @@
     state.answers = new Array(QUESTIONS.length).fill(null);
     showScreen("intro");
   });
+
+  // ---------- type-detail modal (re-open a type summary in full) ----------
+  function showTypeDetail(data, tagLabel) {
+    if (!data || !data.t || !TYPES[data.t]) return;
+    var t = TYPES[data.t];
+    var mods = (data.m || []).filter(function (k) { return !!TYPES[k]; });
+    var s = Array.isArray(data.s) ? data.s : [];
+    document.getElementById("td-tag").textContent = tagLabel || "당신을 닮은 동물은";
+    document.getElementById("td-visual").innerHTML = buildCharacterSVG(data.t, mods);
+    document.getElementById("td-name").textContent = data.n || t.name;
+    document.getElementById("td-blend").textContent = mods.length
+      ? t.name + "가 베이스, 거기에 " + mods.map(function (k) { return TYPES[k].name; }).join("·") + " 기질까지 섞인 조합이에요."
+      : t.tagline;
+    document.getElementById("td-desc").textContent = t.desc;
+    var pct = {};
+    TYPE_ORDER.forEach(function (k, i) { pct[k] = typeof s[i] === "number" ? s[i] : 0; });
+    var ranked = TYPE_ORDER.slice().sort(function (a, b) { return pct[b] - pct[a]; });
+    document.getElementById("td-bars").innerHTML = ranked.slice(0, 5).map(function (k) {
+      var ty = TYPES[k];
+      return '<div class="bar-row"><span class="bar-label">' + ty.emoji + ' ' + ty.name + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + Math.round(pct[k]) + '%;background:' + ty.color + '"></span></span>' +
+        '<span class="bar-pct">' + Math.round(pct[k]) + '%</span></div>';
+    }).join("");
+    document.getElementById("td-good").textContent = TYPES[t.match].emoji + " " + TYPES[t.match].name;
+    document.getElementById("td-bad").textContent = TYPES[t.oppo].emoji + " " + TYPES[t.oppo].name;
+    openOverlay("type-detail-overlay");
+  }
+  function openOverlay(id) { document.getElementById(id).hidden = false; document.body.style.overflow = "hidden"; }
+  function closeOverlay(id) { document.getElementById(id).hidden = true; document.body.style.overflow = ""; }
+  function anyOverlayOpen() {
+    return ["type-detail-overlay", "demo-overlay", "stats-overlay"].some(function (id) { return !document.getElementById(id).hidden; });
+  }
+  document.getElementById("type-detail-close").addEventListener("click", function () { closeOverlay("type-detail-overlay"); });
+  document.getElementById("type-detail-overlay").addEventListener("click", function (e) { if (e.target === this) closeOverlay("type-detail-overlay"); });
+  document.getElementById("stats-close").addEventListener("click", function () { closeOverlay("stats-overlay"); });
+  document.getElementById("stats-overlay").addEventListener("click", function (e) { if (e.target === this) closeOverlay("stats-overlay"); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!document.getElementById("type-detail-overlay").hidden) closeOverlay("type-detail-overlay");
+    else if (!document.getElementById("stats-overlay").hidden) closeOverlay("stats-overlay");
+    else if (!document.getElementById("demo-overlay").hidden) closeDemo(false);
+  });
+
+  // ---------- demographics mini-step (optional, before result) ----------
+  var demoState = { g: "", a: "" };
+  var demoPending = null;
+  (function wireDemo() {
+    function bind(wrapId, key) {
+      var wrap = document.getElementById(wrapId);
+      wrap.addEventListener("click", function (e) {
+        var b = e.target.closest(".demo-pill");
+        if (!b) return;
+        var v = b.getAttribute("data-" + key) || "";
+        demoState[key] = demoState[key] === v ? "" : v;
+        Array.prototype.forEach.call(wrap.querySelectorAll(".demo-pill"), function (x) {
+          x.classList.toggle("on", (x.getAttribute("data-" + key) || "") === demoState[key] && demoState[key] !== "");
+        });
+      });
+    }
+    bind("demo-gender", "g");
+    bind("demo-age", "a");
+    document.getElementById("demo-submit").addEventListener("click", function () { closeDemo(true); });
+    document.getElementById("demo-skip").addEventListener("click", function () { closeDemo(false); });
+  })();
+  function askDemographics(done) {
+    demoPending = done;
+    demoState = { g: "", a: "" };
+    Array.prototype.forEach.call(document.querySelectorAll("#demo-overlay .demo-pill"), function (b) { b.classList.remove("on"); });
+    openOverlay("demo-overlay");
+  }
+  function closeDemo(useIt) {
+    closeOverlay("demo-overlay");
+    state.demo = useIt ? { g: demoState.g, a: demoState.a } : { g: "", a: "" };
+    var fn = demoPending; demoPending = null;
+    if (fn) fn();
+  }
+
+  // ---------- stats: estimated distribution now, real numbers baked in later ----------
+  var STATS_LOG_KEY = "date_mbti_stats_log_v1";
+  // 예상 분포 (표본 부족 구간). 순서: activity, alcohol, foodie, cafe, ott, popup, explorer, culture, maker, healer
+  var STATS_SEED = {
+    base: { activity: 10, alcohol: 9, foodie: 15, cafe: 14, ott: 12, popup: 8, explorer: 6, culture: 9, maker: 5, healer: 12 },
+    byGender: {
+      m: { activity: 1.3, alcohol: 1.35, foodie: 1.0, cafe: 0.8, ott: 1.2, popup: 0.65, explorer: 1.15, culture: 0.85, maker: 1.15, healer: 0.8 },
+      f: { activity: 0.8, alcohol: 0.75, foodie: 1.05, cafe: 1.28, ott: 0.9, popup: 1.45, explorer: 0.9, culture: 1.2, maker: 0.95, healer: 1.2 },
+      x: { activity: 1, alcohol: 1, foodie: 1, cafe: 1, ott: 1, popup: 1, explorer: 1, culture: 1, maker: 1, healer: 1 }
+    },
+    byAge: {
+      "10": { activity: 1.15, alcohol: 0.15, foodie: 0.8, cafe: 1.2, ott: 1.45, popup: 1.6, explorer: 0.9, culture: 0.65, maker: 1.15, healer: 0.8 },
+      "20": { activity: 1.15, alcohol: 1.2, foodie: 0.95, cafe: 1.2, ott: 1.1, popup: 1.4, explorer: 1.0, culture: 0.85, maker: 1.05, healer: 0.9 },
+      "30": { activity: 1.05, alcohol: 1.15, foodie: 1.2, cafe: 1.05, ott: 0.95, popup: 0.9, explorer: 1.0, culture: 0.95, maker: 1.0, healer: 1.1 },
+      "40": { activity: 1.0, alcohol: 0.95, foodie: 1.15, cafe: 0.95, ott: 0.85, popup: 0.5, explorer: 1.1, culture: 1.3, maker: 0.95, healer: 1.25 },
+      "50": { activity: 0.95, alcohol: 0.85, foodie: 1.1, cafe: 1.0, ott: 0.8, popup: 0.35, explorer: 1.15, culture: 1.45, maker: 0.9, healer: 1.35 },
+      "60": { activity: 0.85, alcohol: 0.7, foodie: 1.05, cafe: 1.05, ott: 0.75, popup: 0.3, explorer: 1.15, culture: 1.5, maker: 0.8, healer: 1.45 }
+    }
+  };
+  // 스케줄 작업이 GitHub Pages로 수집된 익명 표본을 집계하면 여기에 채운다:
+  // { total: <총 응답수>, minCell: <셀 최소 표본>, cells: { "all|all": [10개 %], "m|30": [...], ... } }
+  // total 과 해당 cell 표본이 충분할 때만 실제 수치로 표시, 아니면 STATS_SEED 로 폴백.
+  var STATS_REAL = null;
+  var STATS_REAL_MIN = 300;
+
+  function statsDistribution(gender, age) {
+    var out = {}, sum = 0;
+    TYPE_ORDER.forEach(function (k) {
+      var v = STATS_SEED.base[k];
+      if (gender && STATS_SEED.byGender[gender]) v *= STATS_SEED.byGender[gender][k];
+      if (age && STATS_SEED.byAge[age]) v *= STATS_SEED.byAge[age][k];
+      out[k] = v; sum += v;
+    });
+    TYPE_ORDER.forEach(function (k) { out[k] = sum > 0 ? out[k] / sum * 100 : 0; });
+    return out;
+  }
+  function recordStatSample(topKey) {
+    try {
+      var d = state.demo || {};
+      var arr = JSON.parse(localStorage.getItem(STATS_LOG_KEY) || "[]");
+      if (!Array.isArray(arr)) arr = [];
+      arr.push({ t: topKey, g: d.g || "", a: d.a || "", ts: Date.now() });
+      if (arr.length > 300) arr = arr.slice(arr.length - 300);
+      localStorage.setItem(STATS_LOG_KEY, JSON.stringify(arr));
+    } catch (e) { /* ignore */ }
+  }
+
+  var statsFilter = { g: "", a: "" };
+  function renderStatsBars() {
+    var key = (statsFilter.g || "all") + "|" + (statsFilter.a || "all");
+    var dist, isReal = false, n = 0;
+    if (STATS_REAL && STATS_REAL.cells && STATS_REAL.cells[key] && STATS_REAL.total >= STATS_REAL_MIN) {
+      dist = {}; TYPE_ORDER.forEach(function (k, i) { dist[k] = STATS_REAL.cells[key][i] || 0; });
+      isReal = true; n = STATS_REAL.total;
+    } else {
+      dist = statsDistribution(statsFilter.g, statsFilter.a);
+    }
+    var ranked = TYPE_ORDER.slice().sort(function (a, b) { return dist[b] - dist[a]; });
+    var max = dist[ranked[0]] || 1;
+    var myType = null;
+    try { var lr = JSON.parse(localStorage.getItem(LS_KEY) || "null"); if (lr && lr.payload && lr.payload.t) myType = lr.payload.t; } catch (e) { /* ignore */ }
+    document.getElementById("stats-bars").innerHTML = ranked.map(function (k) {
+      var ty = TYPES[k], v = dist[k];
+      var mine = k === myType ? ' <span class="stats-mine">나</span>' : '';
+      return '<div class="bar-row stats-row"><span class="bar-label">' + ty.emoji + ' ' + ty.name + mine + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + (v / max * 100).toFixed(1) + '%;background:' + ty.color + '"></span></span>' +
+        '<span class="bar-pct">' + v.toFixed(1) + '%</span></div>';
+    }).join("");
+    document.getElementById("stats-note").textContent = isReal
+      ? "실제 응답 " + n.toLocaleString() + "명 기준"
+      : "아직 표본이 적어 예상 분포예요 — 응답이 쌓이면 실제 수치로 바뀌어요";
+    var topT = TYPES[ranked[0]], rareT = TYPES[ranked[ranked.length - 1]];
+    document.getElementById("stats-foot").textContent =
+      "이 조건에서 가장 흔한 유형은 " + topT.emoji + " " + topT.name + ", 가장 드문 유형은 " + rareT.emoji + " " + rareT.name + "이에요.";
+  }
+  (function wireStatsFilters() {
+    function bind(wrapId, key) {
+      var wrap = document.getElementById(wrapId);
+      wrap.addEventListener("click", function (e) {
+        var b = e.target.closest(".demo-pill");
+        if (!b) return;
+        statsFilter[key] = b.getAttribute("data-" + key) || "";
+        Array.prototype.forEach.call(wrap.querySelectorAll(".demo-pill"), function (x) { x.classList.toggle("on", x === b); });
+        renderStatsBars();
+      });
+    }
+    bind("stats-f-gender", "g");
+    bind("stats-f-age", "a");
+  })();
+  function syncStatsFilterPills() {
+    [["stats-f-gender", "g"], ["stats-f-age", "a"]].forEach(function (pair) {
+      var wrap = document.getElementById(pair[0]);
+      Array.prototype.forEach.call(wrap.querySelectorAll(".demo-pill"), function (x) {
+        x.classList.toggle("on", (x.getAttribute("data-" + pair[1]) || "") === statsFilter[pair[1]]);
+      });
+    });
+  }
+  function openStats(seedFromDemo) {
+    if (seedFromDemo && state.demo && (state.demo.g || state.demo.a)) {
+      statsFilter = { g: state.demo.g || "", a: state.demo.a || "" };
+    }
+    syncStatsFilterPills();
+    renderStatsBars();
+    openOverlay("stats-overlay");
+  }
+  document.getElementById("btn-stats").addEventListener("click", function () { openStats(true); });
+  document.getElementById("btn-stats-intro").addEventListener("click", function () { statsFilter = { g: "", a: "" }; openStats(false); });
 
   // ---------- couple matching: encode / decode / share links ----------
   function b64EncodeUtf8(str) { return btoa(unescape(encodeURIComponent(str))); }
@@ -1320,6 +1634,17 @@
     document.getElementById("couple-name-a").textContent = dataA.n;
     document.getElementById("couple-name-b").textContent = dataB.n;
 
+    [[document.getElementById("couple-visual-a").parentNode, dataA], [document.getElementById("couple-visual-b").parentNode, dataB]].forEach(function (pair) {
+      var el = pair[0], d = pair[1];
+      if (!el) return;
+      el.classList.add("clickable");
+      el.setAttribute("role", "button");
+      el.setAttribute("tabindex", "0");
+      var open = function () { showTypeDetail(d, (d.n ? d.n + " 님" : "이 사람") + "의 유형"); };
+      el.onclick = open;
+      el.onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } };
+    });
+
     var compat = computeCompat(pctA, pctB);
     document.getElementById("compat-ring").style.setProperty("--pct", compat.pct);
     document.getElementById("compat-pct-num").textContent = compat.pct + "%";
@@ -1337,6 +1662,7 @@
     var pst = loadPairState(pairId);
     if (typeof pst.area !== "string") pst.area = "";
     if (typeof pst.ageBand !== "string") pst.ageBand = "";
+    if (!pst.ageBand && state.demo && state.demo.a) pst.ageBand = state.demo.a;
     function persist() { savePairState(pairId, pst); }
     function usedItemIds() { return pst.slots.map(function (s) { return s.itemId; }); }
 
