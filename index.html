@@ -795,6 +795,17 @@
   });
 
   var LS_KEY = "date_mbti_last_result_v2";
+  var LAST_COUPLE_KEY = "date_mbti_last_couple_v1";
+
+  function saveLastCouple(codeA, codeB) {
+    try { localStorage.setItem(LAST_COUPLE_KEY, JSON.stringify({ a: codeA, b: codeB, at: Date.now() })); } catch (e) { /* ignore */ }
+  }
+  function loadLastCouple() {
+    try { return JSON.parse(localStorage.getItem(LAST_COUPLE_KEY) || "null"); } catch (e) { return null; }
+  }
+  function clearLastCouple() {
+    try { localStorage.removeItem(LAST_COUPLE_KEY); } catch (e) { /* ignore */ }
+  }
 
   var state = { idx: 0, answers: new Array(QUESTIONS.length).fill(null), lastPayload: null, demo: { g: "", a: "" } };
   var partnerData = null;
@@ -1728,6 +1739,7 @@
 
   // ---------- couple matching: couple result screen ----------
   function renderCoupleScreen(dataA, dataB, codeA, codeB) {
+    saveLastCouple(codeA, codeB);
     var pctA = {}, pctB = {};
     TYPE_ORDER.forEach(function (k, i) { pctA[k] = dataA.s[i]; pctB[k] = dataB.s[i]; });
 
@@ -1989,6 +2001,7 @@
     }
 
     document.getElementById("btn-couple-restart").onclick = function () {
+      clearLastCouple();
       window.location.href = window.location.origin + window.location.pathname;
     };
 
@@ -2015,6 +2028,19 @@
         document.getElementById("invited-emoji").textContent = (TYPES[dp.t] || {}).emoji || "💌";
         document.getElementById("invited-title").textContent = dp.n;
         showScreen("invited");
+      }
+      return;
+    }
+
+    // URL에 파라미터가 없는 일반 방문 — 이 기기에서 이미 궁합을 확인한 적 있으면 그 화면으로 바로 이동
+    var savedPair = loadLastCouple();
+    if (savedPair && savedPair.a && savedPair.b) {
+      var sdA = decodeResultCode(savedPair.a), sdB = decodeResultCode(savedPair.b);
+      if (sdA && sdB) {
+        renderCoupleScreen(sdA, sdB, savedPair.a, savedPair.b);
+        showScreen("couple");
+      } else {
+        clearLastCouple();
       }
     }
   })();
