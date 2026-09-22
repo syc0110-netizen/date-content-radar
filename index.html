@@ -1628,38 +1628,35 @@
       menu: ["브런치 세트 — 에그·샐러드 구성", "핸드드립 커피"],
       hashtags: ["#한남동", "#브런치", "#분위기맛집"], meta: { mealType: "아침~점심", priceRange: "1인 2~3만원", reservation: "주말 웨이팅 가능" },
       sourceUrl: "https://kr.trip.com/moments/detail/seoul-234-140405820/",
-      tags: { cafe: 2, healer: 1 } }
+      tags: { cafe: 2, healer: 1 } },
+    { id: "mangwon-sashimi", kind: "restaurant", category: "망원동사시미", region: "홍대·마포권", emoji: "🐟",
+      title: "선술집 위군", tagline: "숙성 사시미와 빈티지 조명이 어우러진 망원동 술집",
+      desc: "포은로 골목의 숙성 사시미 전문점. 빈티지 감성의 아늑한 조명 아래 오늘의 사시미를 메인으로, 생선구이와 무조림을 곁들이는 조용한 저녁 데이트로 좋아요.",
+      menu: ["오늘의 사시미 — 매일 바뀌는 숙성 사시미 메인", "생선구이·무조림(오토시) — 곁들임 안주"],
+      hashtags: ["#망원동", "#사시미", "#이자카야"], meta: { mealType: "저녁", priceRange: "2인 6~9만원", reservation: "3인 초과 입장 불가·주차 불가, 예약 권장" },
+      sourceUrl: "https://kr.imboldn.com/digest/%EB%A7%9D%EC%9B%90%EB%8F%99-%EC%88%A0%EC%A7%91-%EC%B6%94%EC%B2%9C-6%EC%84%A0/",
+      tags: { alcohol: 2, foodie: 1, healer: 1 } }
   ];
   var RESTAURANT_BY_ID = {};
   RESTAURANT_POOL.forEach(function (item) { RESTAURANT_BY_ID[item.id] = item; });
 
   // ---------- couple matching: ticketing-deadline alerts (exhibitions + concerts, web-researched) ----------
   var TICKET_ALERTS = [
-    { id: "concert-hwangminhyun-fanmeeting", kind: "concert", emoji: "🎤",
-      title: "황민현 팬미팅 〈도원경〉 - 서울", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
-      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-10", expiresOn: "2026-09-10",
-      summary: "티켓 오픈이 코앞이라 놓치기 쉬워요 — 관심 있다면 예매처 알림 설정 필수",
-      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2 } },
-    { id: "concert-sim-gyuseon-sanctuary", kind: "concert", emoji: "🎤",
-      title: "심규선 단독 콘서트 〈SANCTUARY〉", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
-      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-11", expiresOn: "2026-09-11",
-      summary: "감성 보컬리스트 심규선의 단독 콘서트 예매가 곧 열려요",
-      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2, healer: 1 } },
-    { id: "concert-roykim-roy", kind: "concert", emoji: "🎤",
-      title: "로이킴 LIVE TOUR 〈R:O:Y〉 in SEOUL", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
-      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-11", expiresOn: "2026-09-11",
-      summary: "발라드·어쿠스틱 감성의 로이킴 단독 투어 서울 공연",
-      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 2, alcohol: 1 } },
-    { id: "concert-kwonjinah-saveme", kind: "concert", emoji: "🎤",
-      title: "권진아 LIVE TOUR 'SAVE ME' IN SEOUL", venue: "공연장 미정 — 예매처에서 확인 필요", region: "서울",
-      dateRange: "정확한 공연일은 예매처 확인", bookingOpensOn: "2026-09-15", expiresOn: "2026-09-15",
-      summary: "잔잔한 보컬로 사랑받는 권진아의 단독 투어 서울 공연",
-      link: "https://www.tickettime.co.kr/schedules", urgent: true, tags: { culture: 1, healer: 2 } },
+    { id: "concert-txt-steal-the-wind", kind: "concert", emoji: "🎤",
+      title: "투모로우바이투게더 새 월드투어 〈STEAL THE WIND〉 - 서울", venue: "KSPO DOME (올림픽공원)", region: "서울",
+      dateRange: "2026-11-13 ~ 2026-11-15", bookingOpensOn: "2026-10-01", expiresOn: "2026-10-01",
+      summary: "다섯 번째 월드투어를 서울에서 여는 공연이에요 — 국내 멤버십 선예매가 10/1(목)부터 시작돼요",
+      link: "https://tickets.interpark.com/contents/genre/concert", urgent: true, tags: { culture: 2 } },
+    { id: "concert-monstax-nexus-encore", kind: "concert", emoji: "🎤",
+      title: "MONSTA X WORLD TOUR 〈THE X : NEXUS〉 - ENCORE", venue: "인스파이어 아레나 (인천 영종도)", region: "인천(서울 근교)",
+      dateRange: "2026-11-21 ~ 2026-11-22", bookingOpensOn: "2026-09-28", expiresOn: "2026-09-28",
+      summary: "월드투어 앵콜 콘서트 — 티켓 오픈이 9/28(월) 20시로 예정돼 있어요",
+      link: "https://tickets.interpark.com/contents/genre/concert", urgent: true, tags: { culture: 2, alcohol: 1 } },
     { id: "exhibition-goya-sac", kind: "exhibition", emoji: "🖼️",
       title: "스페인의 거장 고야: 이성이 잠들 때, 괴물이 깨어난다", venue: "예술의전당 한가람미술관 제7전시실", region: "서초·예술의전당권",
       dateRange: "2026-06-26 ~ 2026-09-30", bookingOpensOn: null, expiresOn: "2026-09-30",
-      summary: "관람 마감이 9월 말이에요 — 입장은 마감 1시간 전(오후 6시)까지",
-      link: "https://www.sac.or.kr/site/main/show/show_view?SN=78392", urgent: false, tags: { culture: 2 } }
+      summary: "관람 마감이 이제 일주일 남짓 남았어요 — 입장은 마감 1시간 전(오후 6시)까지",
+      link: "https://www.sac.or.kr/site/main/show/show_view?SN=78392", urgent: true, tags: { culture: 2 } }
   ];
 
   // ---------- couple matching: shared scoring/picking helper (courses + restaurants) ----------
