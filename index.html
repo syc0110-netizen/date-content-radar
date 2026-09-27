@@ -1353,6 +1353,10 @@
   document.getElementById("btn-stats-intro").addEventListener("click", function () { statsFilter = { g: "", a: "" }; openStats(false); });
 
   // ---------- couple matching: encode / decode / share links ----------
+  // 공유 링크는 항상 GitHub Pages 주소로 고정한다. Claude Artifact에서 보는 화면은
+  // 로그인/샌드박스 iframe 제약으로 쿼리스트링(?p=, ?a=&b=)이 그대로 전달되지 않아,
+  // 그 주소로 공유하면 상대방이 링크를 열었을 때 초기화면만 보이는 문제가 있었음.
+  var SHARE_BASE_URL = "https://syc0110-netizen.github.io/date-content-radar/";
   function b64EncodeUtf8(str) { return btoa(unescape(encodeURIComponent(str))); }
   function b64DecodeUtf8(str) { return decodeURIComponent(escape(atob(str))); }
   function encodeResult(obj) {
@@ -1367,7 +1371,7 @@
     } catch (e) { return null; }
   }
   function buildInviteLink(payload) {
-    return window.location.origin + window.location.pathname + "?p=" + encodeResult(payload);
+    return SHARE_BASE_URL + "?p=" + encodeResult(payload);
   }
 
   function copyText(text, feedbackId) {
@@ -2009,7 +2013,7 @@
       };
     });
 
-    var coupleLink = window.location.origin + window.location.pathname + "?a=" + codeA + "&b=" + codeB;
+    var coupleLink = SHARE_BASE_URL + "?a=" + codeA + "&b=" + codeB;
     document.getElementById("btn-copy-couple-link").onclick = function () {
       copyText(coupleLink, "couple-share-copied");
     };
