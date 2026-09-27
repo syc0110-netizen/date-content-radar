@@ -1635,7 +1635,28 @@
       menu: ["오늘의 사시미 — 매일 바뀌는 숙성 사시미 메인", "생선구이·무조림(오토시) — 곁들임 안주"],
       hashtags: ["#망원동", "#사시미", "#이자카야"], meta: { mealType: "저녁", priceRange: "2인 6~9만원", reservation: "3인 초과 입장 불가·주차 불가, 예약 권장" },
       sourceUrl: "https://kr.imboldn.com/digest/%EB%A7%9D%EC%9B%90%EB%8F%99-%EC%88%A0%EC%A7%91-%EC%B6%94%EC%B2%9C-6%EC%84%A0/",
-      tags: { alcohol: 2, foodie: 1, healer: 1 } }
+      tags: { alcohol: 2, foodie: 1, healer: 1 } },
+    { id: "gyeongnidan-steak", kind: "restaurant", category: "경리단길스테이크바", region: "용산·이태원권", emoji: "🧈",
+      title: "여인숙", tagline: "기버터를 부어주는 퍼포먼스가 있는 경리단길 스테이크바",
+      desc: "녹사평역 인근 경리단길의 스테이크 전문점. 뜨겁게 달군 기버터를 스테이크 위에 직접 부어주는 시각적 퍼포먼스가 특징이라 데이트 사진으로도 좋아요.",
+      menu: ["기버터 스테이크 350g — 뜨거운 기버터를 부어주는 시그니처", "새우해장라면 — 마무리로 곁들이기 좋은 메뉴"],
+      hashtags: ["#경리단길", "#스테이크", "#기버터"], meta: { mealType: "저녁", priceRange: "1인 4~5만원", reservation: "캐치테이블 예약 가능" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=sPYfecoGtMUH",
+      tags: { foodie: 2, alcohol: 1 } },
+    { id: "apgujeong-samgyeopsal", kind: "restaurant", category: "압구정로데오고기", region: "강남·압구정권", emoji: "🥓",
+      title: "청담고수 청담2호점", tagline: "콜키지 프리로 와인 곁들이는 압구정 로데오 숙성고기",
+      desc: "압구정 로데오 명품거리 인근의 숙성 돼지고기 전문점. 콜키지가 무료라 와인을 챙겨가서 고기와 함께 즐기기 좋아요.",
+      menu: ["숙성 삼겹살 — 대표 메뉴", "야채모둠 — 곁들임"],
+      hashtags: ["#압구정로데오", "#숙성고기", "#콜키지프리"], meta: { mealType: "점심~저녁", priceRange: "1인 3~4만원", reservation: "콜키지 프리(2인 1병)·예약 권장" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=r7K2ZyCcbm3E",
+      tags: { alcohol: 2, foodie: 1 } },
+    { id: "seochon-samgyeopsal", kind: "restaurant", category: "서촌고깃집", region: "종로·서촌권", emoji: "🔥",
+      title: "대하식당", tagline: "솥뚜껑에 구워내는 서촌 노포 삼겹살",
+      desc: "경복궁역 인근 서촌 골목의 오래된 고깃집. 솥뚜껑 위에 구워내는 삼겹살이 대표 메뉴로, 꾸밈없는 노포 분위기가 데이트에 특별한 느낌을 줘요.",
+      menu: ["삼겹살 600g — 솥뚜껑에 구워내는 대표 메뉴"],
+      hashtags: ["#서촌", "#노포", "#삼겹살"], meta: { mealType: "저녁", priceRange: "2인 3~4만원", reservation: "예약 없이 방문 가능·일요일 휴무" },
+      sourceUrl: "https://www.diningcode.com/profile.php?rid=iqCtl5U8yBHt",
+      tags: { foodie: 2, explorer: 1 } }
   ];
   var RESTAURANT_BY_ID = {};
   RESTAURANT_POOL.forEach(function (item) { RESTAURANT_BY_ID[item.id] = item; });
@@ -1656,7 +1677,17 @@
       title: "스페인의 거장 고야: 이성이 잠들 때, 괴물이 깨어난다", venue: "예술의전당 한가람미술관 제7전시실", region: "서초·예술의전당권",
       dateRange: "2026-06-26 ~ 2026-09-30", bookingOpensOn: null, expiresOn: "2026-09-30",
       summary: "관람 마감이 이제 일주일 남짓 남았어요 — 입장은 마감 1시간 전(오후 6시)까지",
-      link: "https://www.sac.or.kr/site/main/show/show_view?SN=78392", urgent: true, tags: { culture: 2 } }
+      link: "https://www.sac.or.kr/site/main/show/show_view?SN=78392", urgent: true, tags: { culture: 2 } },
+    { id: "concert-oneus-full-moon", kind: "concert", emoji: "🎤",
+      title: "원어스 월드투어 〈FULL MOON〉 - 서울", venue: "세종대학교 대양홀", region: "서울",
+      dateRange: "2026-10-24 ~ 2026-10-25", bookingOpensOn: "2026-09-28", expiresOn: "2026-09-28",
+      summary: "완전체로 도는 첫 월드투어 서울 공연 — 티켓 오픈이 9/28(월) 20시로 예정돼 있어요",
+      link: "https://www.ticketlink.co.kr/", urgent: true, tags: { culture: 2 } },
+    { id: "exhibition-hamyangah-artsonje", kind: "exhibition", emoji: "🖼️",
+      title: "함양아: 정의되지 않은 파노라마", venue: "아트선재센터", region: "종로·북촌권",
+      dateRange: "2026-07-31 ~ 2026-10-04", bookingOpensOn: null, expiresOn: "2026-10-04",
+      summary: "8년간의 예술 연구 프로젝트를 담은 개인전 — 관람 마감까지 일주일 정도 남았어요",
+      link: "https://artsonje.org/exhibition/yang-ah-ham-undefined-panorama-kr/", urgent: true, tags: { culture: 2 } }
   ];
 
   // ---------- couple matching: shared scoring/picking helper (courses + restaurants) ----------
