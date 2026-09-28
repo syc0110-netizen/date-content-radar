@@ -77,6 +77,7 @@
     padding: 14px 16px; margin: 0 auto 24px; max-width: 420px; font-size: 13.5px; color: var(--ink-soft);
     display: flex; align-items: center; gap: 10px; justify-content: center; text-align: left;
   }
+  .last-result[hidden] { display: none; }
   .last-result b { color: var(--ink); }
   .type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 auto 32px; max-width: 460px; }
   .type-peek { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 4px; text-align: center; }
@@ -344,7 +345,6 @@
   .radar-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 
   .ticket-alerts { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
-  .ticket-alerts[hidden] { display: none; }
   .ticket-alerts[hidden] { display: none; }
   .ticket-alert-card {
     display: flex; align-items: center; gap: 10px; background: var(--card-soft); border: 1px solid var(--gold);
